@@ -67,6 +67,11 @@ export default function AuthView() {
               type="button"
               route="/hackathon/auth/LogInView"
             />
+            <LinkButton
+              label="Inscription"
+              type="button"
+              route="/hackathon/auth/SignInView"
+            />
             {/* <LinkButton
               label="Jeu"
               type="button"

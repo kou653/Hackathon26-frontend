@@ -1,22 +1,23 @@
 {
   "files": {
-    "main.css": "/static/css/main.210e42bf.css",
-    "main.js": "/static/js/main.501f5341.js",
+    "main.css": "/static/css/main.d6ed4bad.css",
+    "main.js": "/static/js/main.224f718d.js",
     "static/js/511.f310fe8f.chunk.js": "/static/js/511.f310fe8f.chunk.js",
     "static/media/song.mp3": "/static/media/song.32c64bf1785f966b9e7e.mp3",
-    "static/media/logoHackathon-PhotoRoom2.png": "/static/media/logoHackathon-PhotoRoom2.8b1ce0f409090cb345b7.png",
-    "static/media/logoHackathon-PhotoRoom.png": "/static/media/logoHackathon-PhotoRoom.0f23db818aa2f9307b53.png",
-    "static/media/logoSDI-PhotoRoom.png": "/static/media/logoSDI-PhotoRoom.4973351e27cf7081e5be.png",
-    "static/media/innovationWeek.png": "/static/media/innovationWeek.eb524427c9d0fc0823ab.png",
-    "static/media/jetic.png": "/static/media/jetic.aaa92435f5832a7412e5.png",
-    "static/media/innovationRoom.png": "/static/media/innovationRoom.9a2b8a20cb70262d5f8c.png",
+    "static/media/logoC2E.jpg": "/static/media/logoC2E.f115ec3aed1772dcb448.jpg",
+    "static/media/jetic.png": "/static/media/jetic.6c13becf64578cb97103.png",
+    "static/media/innovationWeek.png": "/static/media/innovationWeek.7c2dd6ba50158e621f28.png",
+    "static/media/logoHackathon-PhotoRoom.png": "/static/media/logoHackathon-PhotoRoom.7c2dd6ba50158e621f28.png",
+    "static/media/logoHackathon-PhotoRoom2.png": "/static/media/logoHackathon-PhotoRoom2.86ee07ead3de3c8ffc30.png",
+    "static/media/innovationRoom.png": "/static/media/innovationRoom.e293b130fc6a11d20545.png",
+    "static/media/logoSDI-PhotoRoom.png": "/static/media/logoSDI-PhotoRoom.e293b130fc6a11d20545.png",
     "index.html": "/index.html",
-    "main.210e42bf.css.map": "/static/css/main.210e42bf.css.map",
-    "main.501f5341.js.map": "/static/js/main.501f5341.js.map",
+    "main.d6ed4bad.css.map": "/static/css/main.d6ed4bad.css.map",
+    "main.224f718d.js.map": "/static/js/main.224f718d.js.map",
     "511.f310fe8f.chunk.js.map": "/static/js/511.f310fe8f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.210e42bf.css",
-    "static/js/main.501f5341.js"
+    "static/css/main.d6ed4bad.css",
+    "static/js/main.224f718d.js"
   ]
 }

@@ -228,18 +228,18 @@ const AppRouter = () => {
             </>
           ),
         },
-        // {
-        //   path: "hackathon/teaser/pannel",
-        //   element: (
-        //     <>
-        //       <GuardedRoute
-        //         required={false}
-        //         component={PannelView}
-        //         allowedRoles={["participant"]}
-        //       />
-        //     </>
-        //   ),
-        // },
+        {
+          path: "hackathon/teaser/pannel",
+          element: (
+            <>
+              <GuardedRoute
+                required={false}
+                component={PannelView}
+                allowedRoles={["participant"]}
+              />
+            </>
+          ),
+        },
         {
           path: "hackathon/game/rank",
           element: (
@@ -290,6 +290,24 @@ const AppRouter = () => {
           element: (
             <>
               <LogInView />
+              <Toaster />
+            </>
+          ),
+        },
+        {
+          path: "hackathon/auth/SignInView",
+          element: (
+            <>
+              <SignInView />
+              <Toaster />
+            </>
+          ),
+        },
+        {
+          path: "hackathon/auth/SuccessRegistration",
+          element: (
+            <>
+              <SuccessRegistration />
               <Toaster />
             </>
           ),
