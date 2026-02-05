@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCode, faUserSecret } from "@fortawesome/free-solid-svg-icons";
+// import { faCode, faUserSecret } from "@fortawesome/free-solid-svg-icons";
 import secureLocalStorage from "react-secure-storage";
 import HashLoader from "react-spinners/HashLoader";
 import React, { useState } from "react";

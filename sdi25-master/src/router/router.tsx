@@ -25,7 +25,6 @@ import { Toaster } from "react-hot-toast";
 import React from "react";
 
 import Quiz from "../screens/views/quiz/QuizView.jsx";
-import { CardTravelOutlined } from "@mui/icons-material";
 
 const AppRouter = () => {
   const router = createBrowserRouter([
