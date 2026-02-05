@@ -15,6 +15,18 @@ import Button from "../../../../components/ui/ButtonUi.tsx";
 import { handleServiceGetLevelsList } from "../../../../services/ConstantsService.tsx";
 import secureLocalStorage from "react-secure-storage";
 
+interface LeaderInformation {
+  level: number;
+  teamName: string;
+  matricule: string;
+  lastName: string;
+  firstName: string;
+  email: string;
+  gender: string;
+  class: number;
+}
+
+
 export default function RegistrationStep2({
   previousStep,
   nextStep,
@@ -57,19 +69,32 @@ export default function RegistrationStep2({
         setBaseLevel(temp);
       });
     }
+    const storedLeaderInfo = secureLocalStorage.getItem("leaderInformation") as LeaderInformation | null;
 
-    const leaderInformation = secureLocalStorage.getItem("leaderInformation");
+if (storedLeaderInfo) {
+  setTeamName(storedLeaderInfo.teamName);
+  setMatricule(storedLeaderInfo.matricule);
+  setLastname(storedLeaderInfo.lastName);
+  setFirstname(storedLeaderInfo.firstName);
+  setEmail(storedLeaderInfo.email);
+  setFilterValue(getOptionValue(baseLevelList, storedLeaderInfo.level));
+  setGenderValue(getOptionValue(listGender, storedLeaderInfo.gender));
+  setClassValue(getOptionValue(listClass, storedLeaderInfo.class));
+}
 
-    if (leaderInformation) {
-      setTeamName(leaderInformation["teamName"]);
-      setMatricule(leaderInformation["matricule"]);
-      setLastname(leaderInformation["lastName"]);
-      setFirstname(leaderInformation["firstName"]);
-      setEmail(leaderInformation["email"]);
-      setFilterValue(getOptionValue(baseLevelList, leaderInformation["level"]));
-      setGenderValue(getOptionValue(listGender, leaderInformation["gender"]));
-      setClassValue(getOptionValue(listClass, leaderInformation["class"]));
-    }
+
+    // const leaderInformation = secureLocalStorage.getItem("leaderInformation");
+
+    // if (leaderInformation) {
+    //   setTeamName(leaderInformation["teamName"]);
+    //   setMatricule(leaderInformation["matricule"]);
+    //   setLastname(leaderInformation["lastName"]);
+    //   setFirstname(leaderInformation["firstName"]);
+    //   setEmail(leaderInformation["email"]);
+    //   setFilterValue(getOptionValue(baseLevelList, leaderInformation["level"]));
+    //   setGenderValue(getOptionValue(listGender, leaderInformation["gender"]));
+    //   setClassValue(getOptionValue(listClass, leaderInformation["class"]));
+    // }
 
     setIsReady(true);
   }, []);
@@ -212,9 +237,10 @@ export default function RegistrationStep2({
 
                   <Labelui label="Nom de l'équipe" />
                   <InputField
+                    label="nom de l'équipe"
                     onChange={handleTeamNameChange}
                     value={teamName}
-                    lenght={15}
+                    length={15}
                     placeholder="Nom du groupe"
                     type="text"
                   />
@@ -231,9 +257,10 @@ export default function RegistrationStep2({
                     <div className="flex flex-col gap-3">
                       <Labelui label="Matricule" />
                       <InputField
+                      label="Matricule"
                         onChange={handleMAtriculeChange}
                         value={matricule}
-                        lenght={18}
+                        length={18}
                         placeholder="XX-ESATICXXXXX"
                         type="text"
                       />
@@ -242,28 +269,31 @@ export default function RegistrationStep2({
 
                   <Labelui label="Nom" />
                   <InputField
+                  label="Nom"
                     onChange={handleLastnameChange}
                     value={lastname}
                     placeholder="koffi"
-                    lenght={12}
+                    length={12}
                     type="text"
                   />
 
                   <Labelui label="Prénom" />
                   <InputField
+                   label="Prénom"
                     onChange={handleFirstNameChange}
                     value={firstname}
                     placeholder="Ange"
-                    lenght={30}
+                    length={30}
                     type="text"
                   />
 
                   <Labelui label="Email" />
                   <InputField
+                  label="Email"
                     onChange={handleEmailChange}
                     value={email}
                     placeholder="koffi@gmail.com"
-                    lenght={40}
+                    length={40}
                     type="email"
                   />
 
