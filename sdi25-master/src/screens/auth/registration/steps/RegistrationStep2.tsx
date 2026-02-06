@@ -104,7 +104,7 @@ export default function RegistrationStep2({
           (item: { id: number; libelle: string; classes: any[] }) => {
             console.log("🔵 6. Mapping niveau:", item.libelle);
             return {
-              value: item.id,
+              value: item.id,                                                                    
               label: item.libelle,
               classes: item.classes.map((classe: { id: number; libelle: string }) => ({
                 value: classe.id,
