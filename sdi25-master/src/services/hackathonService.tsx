@@ -3,7 +3,7 @@ import axios from "axios";
 import { notify } from "../components/toast/toast.tsx";
 import secureLocalStorage from "react-secure-storage";
 
-const apiUrl = "http://127.0.0.1:8000/api";
+const apiUrl = process.env.REACT_APP_API_URL;
 
 export const handleServiceGetHackathonList = async () => {
   axios.defaults.headers.common["Authorization"] =

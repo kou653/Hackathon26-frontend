@@ -3,7 +3,8 @@ import axios from "axios";
 import { notify } from "../components/toast/toast.tsx";
 import secureLocalStorage from "react-secure-storage";
 
-const apiUrl = "/api";
+// console.log("API =", process.env.REACT_APP_API_URL);
+const apiUrl = process.env.REACT_APP_API_URL + "/api";
 
 export const handleServiceGetLevelsList = async (data: object) => {
   axios.defaults.headers.common["Authorization"] =
