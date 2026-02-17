@@ -14,16 +14,13 @@ export const handleServiceGetCurrentQuiz = async (data: object) => {
     const response = await axios.post(uri, data);
     const status = response.data.status;
 
-    switch (status) {
-    case true:
-      return response.data.data;
-    case false:
-      return [];
+    if (status === true) return response.data.data;
+      return { quiz_state: null, quiz_score: 0, questions: [] }; // ✅ Retour par défaut
+    } catch (error) {
+      notify("error", "Une erreur s'est produite !");
+      return { quiz_state: null, quiz_score: 0, questions: [] }; // ✅ Important
     }
-  } catch (error) {
-    notify("error", "Une erreur s'est produite !");
-  }
-};
+  };
 
 export const handleServiceCreateQuestion = async (data: object) => {
   axios.defaults.headers.common["Authorization"] =
