@@ -318,16 +318,20 @@ export default function PreselectionComponent() {
                     <Accordion.Panel>
                       <Accordion.Title className="font-bold">
                         Question {index + 1} : {item.content}
-                        <button
-                          onClick={() => handleOpen(item)}
-                          className="ml-4 text-blue-500"
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();   // empêche l'ouverture de l'accordéon
+                            handleOpen(item);
+                          }}
+                          className="ml-4 text-blue-500 cursor-pointer inline-flex items-center"
                         >
                           éditer
                           <FontAwesomeIcon
                             className="text-blue-500 text-lg ml-2"
                             icon={faPen}
                           />
-                        </button>
+                        </span>
+
                         <div>
                           <Modal
                             className="bg-[rgb(255,255,255,.10)]"

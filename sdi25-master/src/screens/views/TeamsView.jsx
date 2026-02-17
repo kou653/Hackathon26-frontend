@@ -217,36 +217,21 @@ export default function TeamsView() {
               </th>
 
               <td className="px-6 py-4">
-                <p
-                  className={
-                    item.participants[0].chef === 1 ? "underline-offset-4" : ""
-                  }
-                >
-                  -{" "}
-                  {item.participants.length !== 0
-                    ? `${item.participants[0].etudiant.nom} ${item.participants[0].etudiant.prenom}`
-                    : ""}
-                </p>
-                <p
-                  className={
-                    item.participants[1].chef === 1 ? "underline-offset-4" : ""
-                  }
-                >
-                  -{" "}
-                  {item.participants.length !== 0
-                    ? `${item.participants[1].etudiant.nom} ${item.participants[1].etudiant.prenom}`
-                    : ""}
-                </p>
-                <p
-                  className={
-                    item.participants[2].chef === 1 ? "underline-offset-4" : ""
-                  }
-                >
-                  -{" "}
-                  {item.participants.length !== 0
-                    ? ` ${item.participants[2].etudiant.nom} ${item.participants[2].etudiant.prenom}`
-                    : ""}
-                </p>
+                {item.participants && item.participants.length > 0 ? (
+                  item.participants.map((participant, i) => (
+                    <p
+                      key={i}
+                      className={participant?.chef === 1 ? "underline-offset-4" : ""}
+                    >
+                      -{" "}
+                      {participant?.etudiant
+                        ? `${participant.etudiant.nom} ${participant.etudiant.prenom}`
+                        : "Participant manquant"}
+                    </p>
+                  ))
+                ) : (
+                  <p>Aucun participant</p>
+                )}
               </td>
 
               <th>
@@ -254,22 +239,22 @@ export default function TeamsView() {
                   onClick={() => handleQualifyTeam(item.id)}
                   className="font-medium text-green-500 bg-green-200 px-2 py-1 ml-6 rounded-lg mr-4"
                 >
-                  {item.statut !== 1 ? "Qualifier" : " Disqualifier"}
+                  {item.statut !== 1 ? "Qualifier" : "Disqualifier"}
                 </button>
-                {item.niveau.quiz_available === 1 ? (
+                {item.niveau?.quiz_available === 1 && (
                   <button
                     onClick={() => handleOpenTeamSession(item.id)}
                     className="text-base font-medium text-orange-500 bg-orange-100 px-4 py-2 rounded-lg"
                   >
                     Rénitialiser le quiz
                   </button>
-                ) : null}
+                )}
               </th>
 
               <th>
                 <p className="text-base font-medium text-gray-900 px-6 py-2 rounded-lg">
-                  {item.qsession != null
-                    ? `${item.qsession.score} /${item.qsession.quiz.score}`
+                  {item.qsession
+                    ? `${item.qsession.score} /${item.qsession.quiz?.score ?? 0}`
                     : "0"}
                 </p>
               </th>
@@ -278,6 +263,7 @@ export default function TeamsView() {
       </>
     );
   }
+
 
   return (
     <div className="w-full">
@@ -324,7 +310,7 @@ export default function TeamsView() {
                   type="button"
                   isDisable={false}
                   isReady={true}
-                  // isLoading={isLoading}
+                // isLoading={isLoading}
                 />
                 <Button
                   label="Actualiser"

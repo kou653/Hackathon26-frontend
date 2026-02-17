@@ -68,112 +68,112 @@ export default function RegistrationStep2({
   const listSchool = otherSchool;
 
   // 🔥 Chargement des données au montage du composant
- useEffect(() => {
-  const initializeData = async () => {
-    try {
-      console.log("🔵 1. Début du chargement des données");
+  useEffect(() => {
+    const initializeData = async () => {
+      try {
+        console.log("🔵 1. Début du chargement des données");
 
-      const storedData = secureLocalStorage.getItem("comeFromEsatic");
-      console.log("🔵 2. comeFromEsatic:", storedData);
+        const storedData = secureLocalStorage.getItem("comeFromEsatic");
+        console.log("🔵 2. comeFromEsatic:", storedData);
 
-      if (storedData !== true && storedData !== false) {
-        console.log("❌ comeFromEsatic n'est pas défini correctement");
-        setIsReady(true);
-        return;
-      }
-
-      const isEsatic = storedData === true;
-      setComeFromEsatic(isEsatic);
-
-      if (!isEsatic) {
-        setListClass(listSchool);
-      }
-
-      const data = {
-        esatic: isEsatic ? 1 : 0,
-      };
-
-      console.log("🔵 3. Envoi des données à l'API:", data);
-
-      // Appel API
-      const result = await handleServiceGetLevelsList(data);
-
-      console.log("🔵 4. Résultat de l'API:", result);
-
-      // ✅ Vérifier que result existe ET qu'il a la propriété niveaux
-      if (result && result.niveaux && Array.isArray(result.niveaux)) {
-        console.log("🔵 5. Niveaux reçus:", result.niveaux);
-
-        // Transformer les données
-        const temp = result.niveaux.map(
-          (item: { id: number; libelle: string; classes: any[] }) => {
-            console.log("🔵 6. Mapping niveau:", item.libelle);
-            return {
-              value: item.id,                                                                    
-              label: item.libelle,
-              classes: item.classes.map((classe: { id: number; libelle: string }) => ({
-                value: classe.id,
-                label: classe.libelle,
-              })),
-            };
-          }
-        );
-
-        console.log("🔵 7. Données transformées:", temp);
-
-        setBaseLevel(temp);
-        secureLocalStorage.setItem("levelsList", temp);
-        // // 🔥 Charger automatiquement les classes si un niveau est déjà sélectionné
-        // if (filterLevelValue !== 0) {
-        //   const selectedLevel = temp.find(
-        //     (level: Level) => level.value === filterLevelValue
-        //   );
-
-        //   if (selectedLevel && Array.isArray(selectedLevel.classes)) {
-        //     setListClass(selectedLevel.classes);
-        //   }
-        // }
-
-        console.log("✅ Niveaux chargés avec succès:", temp.length, "niveaux");
-      } else {
-        console.log("❌ Aucune donnée de niveaux reçue ou format incorrect");
-        console.log("❌ result:", result);
-        console.error("error", "Impossible de charger les niveaux. Vérifiez votre connexion.");
-      }
-
-      // Récupérer les informations du leader
-      const storedLeaderInfo = secureLocalStorage.getItem("leaderInformation") as LeaderInformation | null;
-
-      if (storedLeaderInfo) {
-        console.log("🔵 8. Restauration des infos du leader:", storedLeaderInfo);
-        
-        setTeamName(storedLeaderInfo.teamName);
-        setMatricule(storedLeaderInfo.matricule);
-        setLastname(storedLeaderInfo.lastName);
-        setFirstname(storedLeaderInfo.firstName);
-        setEmail(storedLeaderInfo.email);
-        setFilterValue(storedLeaderInfo.level);
-        
-        const genderValue = getOptionValue(listGender, storedLeaderInfo.gender);
-        if (genderValue !== undefined) {
-          setGenderValue(genderValue);
+        if (storedData !== true && storedData !== false) {
+          console.log("❌ comeFromEsatic n'est pas défini correctement");
+          setIsReady(true);
+          return;
         }
+
+        const isEsatic = storedData === true;
+        setComeFromEsatic(isEsatic);
+
+        if (!isEsatic) {
+          setListClass(listSchool);
+        }
+
+        const data = {
+          esatic: isEsatic ? 1 : 0,
+        };
+
+        console.log("🔵 3. Envoi des données à l'API:", data);
+
+        // Appel API
+        const result = await handleServiceGetLevelsList(data);
+
+        console.log("🔵 4. Résultat de l'API:", result);
+
+        // ✅ Vérifier que result existe ET qu'il a la propriété niveaux
+        if (result && result.niveaux && Array.isArray(result.niveaux)) {
+          console.log("🔵 5. Niveaux reçus:", result.niveaux);
+
+          // Transformer les données
+          const temp = result.niveaux.map(
+            (item: { id: number; libelle: string; classes: any[] }) => {
+              console.log("🔵 6. Mapping niveau:", item.libelle);
+              return {
+                value: item.id,                                                                    
+                label: item.libelle,
+                classes: item.classes.map((classe: { id: number; libelle: string }) => ({
+                  value: classe.id,
+                  label: classe.libelle,
+                })),
+              };
+            }
+          );
+
+          console.log("🔵 7. Données transformées:", temp);
+
+          setBaseLevel(temp);
+          secureLocalStorage.setItem("levelsList", temp);
+          // // 🔥 Charger automatiquement les classes si un niveau est déjà sélectionné
+          // if (filterLevelValue !== 0) {
+          //   const selectedLevel = temp.find(
+          //     (level: Level) => level.value === filterLevelValue
+          //   );
+
+          //   if (selectedLevel && Array.isArray(selectedLevel.classes)) {
+          //     setListClass(selectedLevel.classes);
+          //   }
+          // }
+
+          console.log("✅ Niveaux chargés avec succès:", temp.length, "niveaux");
+        } else {
+          console.log("❌ Aucune donnée de niveaux reçue ou format incorrect");
+          console.log("❌ result:", result);
+          console.error("error", "Impossible de charger les niveaux. Vérifiez votre connexion.");
+        }
+
+        // Récupérer les informations du leader
+        const storedLeaderInfo = secureLocalStorage.getItem("leaderInformation") as LeaderInformation | null;
+
+        if (storedLeaderInfo) {
+          console.log("🔵 8. Restauration des infos du leader:", storedLeaderInfo);
         
-        setClassValue(storedLeaderInfo.class);
+          setTeamName(storedLeaderInfo.teamName);
+          setMatricule(storedLeaderInfo.matricule);
+          setLastname(storedLeaderInfo.lastName);
+          setFirstname(storedLeaderInfo.firstName);
+          setEmail(storedLeaderInfo.email);
+          setFilterValue(storedLeaderInfo.level);
+        
+          const genderValue = getOptionValue(listGender, storedLeaderInfo.gender);
+          if (genderValue !== undefined) {
+            setGenderValue(genderValue);
+          }
+        
+          setClassValue(storedLeaderInfo.class);
+        }
+
+        console.log("✅ Initialisation terminée");
+        setIsReady(true);
+
+      } catch (error) {
+        console.error("❌ Erreur lors de l'initialisation:", error);
+        console.error("error", "Une erreur s'est produite lors du chargement");
+        setIsReady(true);
       }
+    };
 
-      console.log("✅ Initialisation terminée");
-      setIsReady(true);
-
-    } catch (error) {
-      console.error("❌ Erreur lors de l'initialisation:", error);
-      console.error("error", "Une erreur s'est produite lors du chargement");
-      setIsReady(true);
-    }
-  };
-
-  initializeData();
-}, []);
+    initializeData();
+  }, []);
 
   // Gestion du changement de niveau
   const handleLevelChange = (selectedOption: { value: number }) => {
@@ -263,7 +263,7 @@ export default function RegistrationStep2({
       {isReady ? (
         <div className="w-full mx-auto max-w-3xl md:bg-white md:p-9 mb-9 md:shadow-xl md:rounded-3xl">
           {/* DEBUG INFO - Retirez ce bloc en production */}
-          <div style={{ padding: '10px', background: '#f0f0f0', marginBottom: '10px', fontSize: '12px' }}>
+          <div style={{ padding: "10px", background: "#f0f0f0", marginBottom: "10px", fontSize: "12px" }}>
             <strong>Debug Info:</strong><br />
             Niveaux chargés: {baseLevel.length}<br />
             Classes disponibles: {listClass.length}<br />
@@ -287,7 +287,7 @@ export default function RegistrationStep2({
                   
                   {/* Affichage du nombre de niveaux */}
                   {baseLevel.length === 0 && (
-                    <p style={{ color: 'red', fontSize: '12px' }}>
+                    <p style={{ color: "red", fontSize: "12px" }}>
                       ⚠️ Aucun niveau disponible
                     </p>
                   )}
@@ -373,7 +373,7 @@ export default function RegistrationStep2({
                   
                   {/* Affichage du nombre de classes */}
                   {listClass.length === 0 && filterLevelValue !== 0 && (
-                    <p style={{ color: 'red', fontSize: '12px' }}>
+                    <p style={{ color: "red", fontSize: "12px" }}>
                       ⚠️ Aucune classe disponible pour ce niveau
                     </p>
                   )}

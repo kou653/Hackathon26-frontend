@@ -22,15 +22,15 @@ export const handleServiceGetLevelsList = async (data: object) => {
     const status = response.data.status;
 
     switch (status) {
-      case true:
-        console.log("✅ Données reçues:", response.data.data);
-        return response.data.data; // ✅ RETURN est important ici
-      case false:
-        notify("error", "Une erreur s'est produite !");
-        return null; // ✅ Retourner null au lieu de rien
-      default:
-        notify("error", "Réponse inattendue du serveur !");
-        return null; // ✅ Retourner null
+    case true:
+      console.log("✅ Données reçues:", response.data.data);
+      return response.data.data; // ✅ RETURN est important ici
+    case false:
+      notify("error", "Une erreur s'est produite !");
+      return null; // ✅ Retourner null au lieu de rien
+    default:
+      notify("error", "Réponse inattendue du serveur !");
+      return null; // ✅ Retourner null
     }
   } catch (error) {
     console.error("❌ Erreur API getLevelsList:", error);
@@ -49,14 +49,14 @@ export const handleServiceGetClassList = async () => {
     const status = response.data.status;
 
     switch (status) {
-      case true:
-        return response.data.data; // ✅ RETURN
-      case false:
-        notify("error", "Une erreur s'est produite !");
-        return null; // ✅ RETURN
-      default:
-        notify("error", "Réponse inattendue du serveur !");
-        return null; // ✅ RETURN
+    case true:
+      return response.data.data; // ✅ RETURN
+    case false:
+      notify("error", "Une erreur s'est produite !");
+      return null; // ✅ RETURN
+    default:
+      notify("error", "Réponse inattendue du serveur !");
+      return null; // ✅ RETURN
     }
   } catch (error) {
     console.error("❌ Erreur API getClassList:", error);

@@ -75,7 +75,7 @@ export const handleServiceCreateClass = async (data: object) => {
     "Bearer " + secureLocalStorage.getItem("session_token")!;
 
   try {
-    const uri = `${apiUrl}/classe/create`;
+    const uri = `${apiUrl}/api/classe/create`;
     const response = await axios.post(uri, data);
     const status = response.data.status;
 

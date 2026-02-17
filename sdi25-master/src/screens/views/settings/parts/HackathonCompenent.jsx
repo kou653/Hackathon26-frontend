@@ -162,9 +162,9 @@ export default function HackathonCompenent() {
                   </tr>
                 </thead>
                 <tbody>
-                  {hackathonList.map((element, index) => (
+                  {hackathonList.map((element) => (
                     <tr
-                      key={index}
+                      key={element.id}
                       className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
                     >
                       <th
@@ -176,34 +176,28 @@ export default function HackathonCompenent() {
                       <td className="px-6 py-4">
                         {element.pco_1} <br /> {element.pco_2}
                       </td>
-                      {element.inscription === 1 ? (
-                        <td className="px-6 py-4 bg-[#F94C10]">
-                          <button
-                            onClick={() => handleToggleHackathon(element.id)}
-                            className="w-full pt-2"
-                          >
-                            <FontAwesomeIcon
-                              className="text-white text-2xl"
-                              icon={faCheck}
-                            />
-                          </button>
-                        </td>
-                      ) : (
+
+                      <td
+                        className={`px-6 py-4 ${
+                          element.inscription === 1 ? "bg-[#F94C10]" : "bg-gray-200"
+                        }`}
+                      >
                         <button
                           onClick={() => handleToggleHackathon(element.id)}
-                          className="pt-2"
+                          className="w-full pt-2 flex justify-center"
                         >
-                          <td className="px-6 py-4 bg-gray-200">
-                            <FontAwesomeIcon
-                              className="text-black text-2xl"
-                              icon={faXmark}
-                            />
-                          </td>
+                          <FontAwesomeIcon
+                            className={`text-2xl ${
+                              element.inscription === 1 ? "text-white" : "text-black"
+                            }`}
+                            icon={element.inscription === 1 ? faCheck : faXmark}
+                          />
                         </button>
-                      )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
+
               </table>
             </div>
           </div>

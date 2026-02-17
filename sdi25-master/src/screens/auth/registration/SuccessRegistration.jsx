@@ -16,7 +16,7 @@ export default function SuccessRegistration() {
     <div className="h-screen w-screen background-p flex justify-center items-center">
       <div className="w-[500px] sm:bg-white p-9 sm:shadow-[0_5px_19px_3px_rgba(0,0,0,0.1)] sm:rounded-3xl flex flex-col gap-8">
         <p className="font-bold text-center text-2xl">
-          Félicitation, Vous êtes bien inscrit à l&apos;hackthon 2025
+          Félicitation, Vous êtes bien inscrit à l&apos;hackthon 2026
         </p>
         <p className="text-[14px] text-center ">
           Vous pouvez désormais vous connecter à votre espace candidat avec{" "}
