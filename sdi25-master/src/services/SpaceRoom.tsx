@@ -1,94 +1,70 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import axios from "axios";
 import { notify } from "../components/toast/toast.tsx";
-import secureLocalStorage from "react-secure-storage";
-
-const apiUrl = "/api";
+import api from "./axios";
 
 export const handleServiceGetRooms = async () => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/salle/render`;
-    const response = await axios.get(uri);
-    const status = response.data.status;
+    const response = await api.get("/salle/render");
 
-    switch (status) {
-    case true:
+    if (response.data?.status === true) {
       notify("success", "Liste mise à jour");
-      return response.data.data.salles;
-    case false:
-      notify("error", response.data.message);
-      return null;
+      return response.data.data?.salles ?? [];
     }
+
+    notify("error", response.data?.message ?? "Erreur serveur");
+    return [];
   } catch (error) {
-    notify("error", "Une erreur s'est produite");
+    notify("error", "Erreur serveur");
+    return [];
   }
 };
 
 export const handleServiceCreateClass = async (data: object) => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/salle/create`;
-    const response = await axios.post(uri, data);
-    const status = response.data.status;
+    const response = await api.post("/salle/create", data);
 
-    switch (status) {
-    case true:
-      notify("success", "Une classe a bien été créee");
+    if (response.data?.status === true) {
+      notify("success", "Salle créée avec succès");
       return true;
-    case false:
-      notify("error", "Une erreur s'est produite !");
-      break;
     }
+
+    notify("error", response.data?.message ?? "Erreur serveur");
+    return false;
   } catch (error) {
-    notify("error", "Une erreur s'est produite");
+    notify("error", "Erreur serveur");
+    return false;
   }
 };
 
 export const handleServiceUpdateSpace = async (data: object) => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/salle/update`;
-    const response = await axios.post(uri, data);
-    const status = response.data.status;
+    const response = await api.post("/salle/update", data);
 
-    switch (status) {
-    case true:
-      notify("success", "La classe a bien été mise à jour");
+    if (response.data?.status === true) {
+      notify("success", "Salle mise à jour");
       return true;
-    case false:
-      notify("error", response.data.message);
-      break;
     }
+
+    notify("error", response.data?.message ?? "Erreur serveur");
+    return false;
   } catch (error) {
-    notify("error", "Une erreur s'est produite");
+    notify("error", "Erreur serveur");
+    return false;
   }
 };
 
 export const handleServiceDeleteSpace = async (data: object) => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/salle/delete`;
-    const response = await axios.post(uri, data);
-    const status = response.data.status;
+    const response = await api.post("/salle/delete", data);
 
-    switch (status) {
-    case true:
-      notify("success", "La classe a bien été supprimée");
+    if (response.data?.status === true) {
+      notify("success", "Salle supprimée");
       return true;
-    case false:
-      notify("error", response.data.message);
-      break;
     }
+
+    notify("error", response.data?.message ?? "Erreur serveur");
+    return false;
   } catch (error) {
-    notify("error", "Une erreur s'est produite");
+    notify("error", "Erreur serveur");
+    return false;
   }
 };
