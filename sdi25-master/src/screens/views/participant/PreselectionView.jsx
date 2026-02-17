@@ -13,20 +13,13 @@ export default function PreselectionView() {
   const user = secureLocalStorage.getItem("user");
   const [message, setMessage] = useState("");
   const { width, height } = useWindowSize();
-  const [state, setState] = useState(null);
+  const [state, setState] = useState<null | boolean>(null);
   const navigate = useNavigate();
 
   async function getQuizState() {
     try {
-      // Appel sécurisé vers le backend Laravel
-      const result = await handleServiceGetQuizState({
-        url: "https://backend.hackathon26esatic.com/api/quiz/state",
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${user?.token || ""}`,
-          "Content-Type": "application/json",
-        },
-      });
+      // Appel du service tel qu'il est défini dans quizService.tsx
+      const result = await handleServiceGetQuizState();
 
       // Protection : result peut être undefined
       const canPass = result?.canpasstest ?? -1;
@@ -66,9 +59,7 @@ export default function PreselectionView() {
 
   return (
     <div className="pt-9 min-h-screen px-4 lg:px-9 background-p">
-      {user?.team_qualified ? (
-        <Confetti width={width} height={height} />
-      ) : null}
+      {user?.team_qualified ? <Confetti width={width} height={height} /> : null}
 
       <div className="text-center">
         <h2 className="text-2xl md:text-4xl font-black text-black dark:text-white">
@@ -79,7 +70,6 @@ export default function PreselectionView() {
       <section className="text-gray-600 body-font">
         <div className="container py-11 mx-auto">
           <div className="xl:w-1/2 lg:w-3/4 w-full mx-auto flex flex-col justify-center text-justify">
-
             <div>
               <h2 className="mt-9 text-2xl text-center font-black text-black dark:text-white">
                 Test de présélection
