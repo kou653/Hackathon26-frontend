@@ -10,7 +10,7 @@ import Confetti from "react-confetti";
 import Button from "../../../components/ui/ButtonUi.tsx";
 
 export default function PreselectionView() {
-  const user = secureLocalStorage.getItem("user");
+  const user = secureLocalStorage.getItem("user") || {};
   // console.log(user.team_qualified);
   const [message, setMessage] = useState("");
   const { width, height } = useWindowSize();
@@ -18,8 +18,17 @@ export default function PreselectionView() {
   const navigate = useNavigate();
 
   async function getQuizState() {
-    const result = await handleServiceGetQuizState();
-    switch (result.canpasstest) {
+  const result = await handleServiceGetQuizState();
+
+  // 🛡️ Protection contre les réponses invalides
+  if (!result || typeof result.canpasstest === "undefined") {
+    console.error("Quiz state invalide:", result);
+    setState(false);
+    setMessage("Impossible de récupérer l'état du test 😢");
+    return;
+  }
+
+  switch (result.canpasstest) {
     case 0:
       setState(true);
       setMessage("Vous pouvez désormais passer le test 💀");
@@ -38,9 +47,10 @@ export default function PreselectionView() {
       break;
     default:
       setState(false);
-      break;
-    }
+      setMessage("État du test inconnu");
   }
+}
+
 
   useEffect(() => {
     getQuizState();
