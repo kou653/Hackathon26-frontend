@@ -652,7 +652,9 @@ export default function RegistrationStep3({
             />
 
             <Button
-              onClick={() => {}}
+              onClick={() => {
+                // TODO: implement
+              }}
               isLoading={isLoading}
               type="submit"
               label="Soumettre"
