@@ -18,15 +18,8 @@ export default function PreselectionView() {
   const navigate = useNavigate();
 
   async function getQuizState() {
-  const result = await handleServiceGetQuizState();
-
-  if (!result) {
-    setState(false);
-    setMessage("Impossible de récupérer l'état du quiz.");
-    return;
-  }
-
-  switch (result.canpasstest) {
+    const result = await handleServiceGetQuizState();
+    switch (result.canpasstest) {
     case 0:
       setState(true);
       setMessage("Vous pouvez désormais passer le test 💀");
@@ -46,9 +39,8 @@ export default function PreselectionView() {
     default:
       setState(false);
       break;
+    }
   }
-}
-
 
   useEffect(() => {
     getQuizState();

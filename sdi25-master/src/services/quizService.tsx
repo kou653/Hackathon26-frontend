@@ -1,116 +1,137 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import axios from "axios";
 import { notify } from "../components/toast/toast.tsx";
 import secureLocalStorage from "react-secure-storage";
-import api from "./axios";
 
-// Fonction utilitaire pour ajouter le token aux headers
-const getAuthHeader = () => {
-  const token = secureLocalStorage.getItem("session_token");
-  return token ? { Authorization: "Bearer " + token } : {};
-};
-
-// ------------------- Quiz -------------------
+const apiUrl = "/api";
 
 export const handleServiceGetQuiz = async (data: object) => {
-  try {
-    const response = await api.post("/quiz/render", data, {
-      headers: getAuthHeader(),
-    });
+  axios.defaults.headers.common["Authorization"] =
+    "Bearer " + secureLocalStorage.getItem("session_token")!;
 
-    if (response.data.status) return response.data.questions;
-    notify("error", "Une erreur s'est produite !");
-    return null;
+  try {
+    const uri = `${apiUrl}/quiz/render`;
+
+    const response = await axios.post(uri, data);
+    const status = response.data.status;
+
+    switch (status) {
+    case true:
+      return response.data.questions;
+    case false:
+      notify("error", "Une erreur s'est produite !");
+      break;
+    }
   } catch (error) {
-    console.error(error);
-    notify("error", "Erreur serveur !");
-    return null;
+    notify("error", "Une erreur s'est produite !");
   }
 };
 
 export const handleServiceGetQuizState = async () => {
-  try {
-    const response = await api.post("/quiz/state", {}, {
-      headers: getAuthHeader(),
-    });
+  axios.defaults.headers.common["Authorization"] =
+    "Bearer " + secureLocalStorage.getItem("session_token")!;
 
-    if (response.data.status) return response.data.data;
-    notify("error", "Une erreur s'est produite !");
-    return null;
+  try {
+    const uri = `${apiUrl}/quiz/state`;
+
+    const response = await axios.post(uri);
+    const status = response.data.status;
+
+    switch (status) {
+    case true:
+      return response.data.data;
+    case false:
+      notify("error", "Une erreur s'est produite !");
+      break;
+    }
   } catch (error) {
-    console.error(error);
-    notify("error", "Impossible de récupérer l'état du quiz !");
-    return null;
+    notify("error", "Une erreur s'est produite !");
   }
 };
 
 export const handleServiceSendQuizScore = async (data: object) => {
-  try {
-    const response = await api.post("/quiz/submit", data, {
-      headers: getAuthHeader(),
-    });
+  axios.defaults.headers.common["Authorization"] =
+    "Bearer " + secureLocalStorage.getItem("session_token")!;
 
-    if (response.data.status) {
+  try {
+    const uri = `${apiUrl}/quiz/submit`;
+
+    const response = await axios.post(uri, data);
+    const status = response.data.status;
+
+    switch (status) {
+    case true:
       notify("success", "Vos réponses ont bien été envoyées");
       return true;
+    case false:
+      notify("error", "Une erreur s'est produite !");
+      break;
     }
-    notify("error", "Une erreur s'est produite !");
-    return false;
   } catch (error) {
-    console.error(error);
-    notify("error", "Erreur serveur !");
-    return false;
+    notify("error", "Une erreur s'est produite !");
   }
 };
 
-// ------------------- Game -------------------
-
 export const handleServiceGetRandomQuiz = async (data: object) => {
-  try {
-    const response = await api.post("/game/question", data, {
-      headers: getAuthHeader(),
-    });
+  axios.defaults.headers.common["Authorization"] =
+    "Bearer " + secureLocalStorage.getItem("session_token")!;
 
-    if (response.data.status) return response.data.data;
-    notify("error", "Une erreur s'est produite !");
-    return null;
+  try {
+    const uri = `${apiUrl}/game/question`;
+    const response = await axios.post(uri, data);
+    const status = response.data.status;
+
+    switch (status) {
+    case true:
+      return response.data.data;
+    case false:
+      notify("error", "Une erreur s'est produite !");
+      break;
+    }
   } catch (error) {
-    console.error(error);
-    notify("error", "Erreur serveur !");
-    return null;
+    notify("error", "Une erreur s'est produite !");
   }
 };
 
 export const handleServiceSendAnswer = async (data: object) => {
-  try {
-    const response = await api.post("/game/validate", data, {
-      headers: getAuthHeader(),
-    });
+  axios.defaults.headers.common["Authorization"] =
+    "Bearer " + secureLocalStorage.getItem("session_token")!;
 
-    if (response.data.status) {
+  try {
+    const uri = `${apiUrl}/game/validate`;
+    const response = await axios.post(uri, data);
+    const status = response.data.status;
+
+    switch (status) {
+    case true:
       notify("success", "Votre réponse a bien été soumise");
       return true;
+    case false:
+      notify("error", "Une erreur s'est produite !");
+      break;
     }
-    notify("error", "Une erreur s'est produite !");
-    return false;
   } catch (error) {
-    console.error(error);
-    notify("error", "Erreur serveur !");
-    return false;
+    notify("error", "Une erreur s'est produite !");
   }
 };
 
 export const handleServiceGetRankList = async () => {
-  try {
-    const response = await api.get("/game/joueurs/render", {
-      headers: getAuthHeader(),
-    });
+  axios.defaults.headers.common["Authorization"] =
+    "Bearer " + secureLocalStorage.getItem("session_token")!;
 
-    if (response.data.status) return response.data.data;
-    notify("error", "Une erreur s'est produite !");
-    return [];
+  try {
+    const uri = `${apiUrl}/game/joueurs/render`;
+    const response = await axios.get(uri);
+    const status = response.data.status;
+
+    switch (status) {
+    case true:
+      return response.data.data;
+    case false:
+      notify("error", "Une erreur s'est produite !");
+      break;
+    }
   } catch (error) {
-    console.error(error);
-    notify("error", "Erreur serveur !");
-    return [];
+    notify("error", "Une erreur s'est produite !");
   }
 };
