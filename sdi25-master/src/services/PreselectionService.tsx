@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { notify } from "../components/toast/toast.tsx";
 import secureLocalStorage from "react-secure-storage";
 import axios from "axios";
