@@ -262,15 +262,6 @@ export default function RegistrationStep2({
     <div className="w-full">
       {isReady ? (
         <div className="w-full mx-auto max-w-3xl md:bg-white md:p-9 mb-9 md:shadow-xl md:rounded-3xl">
-          {/* DEBUG INFO - Retirez ce bloc en production */}
-          <div style={{ padding: "10px", background: "#f0f0f0", marginBottom: "10px", fontSize: "12px" }}>
-            <strong>Debug Info:</strong><br />
-            Niveaux chargés: {baseLevel.length}<br />
-            Classes disponibles: {listClass.length}<br />
-            Niveau sélectionné: {filterLevelValue}<br />
-            Classe sélectionnée: {ClassValue}<br />
-            comeFromEsatic: {comeFromEsatic ? "Oui" : "Non"}
-          </div>
 
           <form
             className="space-y-6 py-9 mx-auto"
