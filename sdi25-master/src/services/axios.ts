@@ -2,7 +2,7 @@ import axios from "axios";
 import secureLocalStorage from "react-secure-storage";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: process.env.REACT_APP_API_URL + "/api",
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
@@ -23,4 +23,5 @@ api.interceptors.request.use(
 );
 
 export default api;
+
 
