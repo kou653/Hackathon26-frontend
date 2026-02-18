@@ -85,7 +85,7 @@ export default function PreselectionView() {
               <p className="text-center mt-4"> {message} </p>
             </div>
 
-            {state ? (
+            {/* {state ? (
               <div className="flex justify-center mt-24">
                 <Button
                   onClick={() => {
@@ -96,7 +96,23 @@ export default function PreselectionView() {
                   label="Commencer le test"
                 />
               </div>
-            ) : null}
+            ) : null} */}
+            <div
+              className={`flex justify-center mt-24 transition-all duration-300 ${
+                state ? "" : "opacity-40 pointer-events-none"
+              }`}
+            >
+              <Button
+                onClick={() => {
+                  if (state) {
+                    navigate("/hackathon/administration/Rules");
+                  }
+                }}
+                isReady={state}
+                isDisable={!state}
+                label={state ? "Commencer le test" : "Test fermé"}
+              />
+            </div>
           </div> 
         </div>
       </section>
