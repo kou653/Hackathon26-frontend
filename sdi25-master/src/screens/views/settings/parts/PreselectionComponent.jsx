@@ -44,7 +44,7 @@ export default function PreselectionComponent() {
   // variables for question answer ----->
   const [answersValue, setAnswersValue] = useState([]);
   const handleChangeAnswersValue = (event, index) => {
-    var newlist = answersValue;
+    const newlist = [...answersValue];
     newlist[index] = event.target.value;
     setAnswersValue(newlist);
   };
@@ -52,7 +52,7 @@ export default function PreselectionComponent() {
   // variables for question answer ----->
   const [answerScoresValue, setAnswersScoreValue] = useState([]);
   const handleChangeAnswerScoreValue = (event, index) => {
-    var newlist = answerScoresValue;
+    const newlist = [...answerScoresValue];
     newlist[index] = event.target.value;
     setAnswersScoreValue(newlist);
   };
@@ -96,6 +96,7 @@ export default function PreselectionComponent() {
   // function to add a question for the quiz of a specific level
   const handleCreateAnswer = async (id, index) => {
     setIsLoading(true);
+
     const data = {
       niveauId: levelValue,
       questionId: id,
@@ -104,10 +105,20 @@ export default function PreselectionComponent() {
     };
 
     await handleServiceCreateAnswer(data);
-    setIsLoading(false);
+
+    const newAnswers = [...answersValue];
+    const newScores = [...answerScoresValue];
+
+    newAnswers[index] = "";
+    newScores[index] = "";
+
+    setAnswersValue(newAnswers);
+    setAnswersScoreValue(newScores);
 
     handleGetCurrentQuiz();
+    setIsLoading(false);
   };
+
 
   // fonction to delete an answer
   const handleDeleteAnswer = (id) => {
