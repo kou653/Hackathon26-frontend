@@ -82,7 +82,7 @@ export default function NavBar() {
                           </Link>
                         </li>
                       ) : null}
-                      {/* {userRole !== "admin" && isLeader ? (
+                      {userRole !== "admin" && isLeader ? (
                         <li>
                           <Link
                             to="/hackathon/administration/PreselectionView"
@@ -92,7 +92,7 @@ export default function NavBar() {
                             Présélection
                           </Link>
                         </li>
-                      ) : null} */}
+                      ) : null}
                       {userRole !== "admin" && isQualified ? (
                         <li>
                           <Link
@@ -238,7 +238,7 @@ export default function NavBar() {
                       Espace
                     </Link>
                   </li>
-                  {/* {userRole !== "admin" && isLeader ? (
+                  {userRole !== "admin" && isLeader ? (
                     <li>
                       <Link
                         to="/hackathon/administration/PreselectionView"
@@ -248,7 +248,7 @@ export default function NavBar() {
                         Présélection
                       </Link>
                     </li>
-                  ) : null} */}
+                  ) : null}
                   {userRole !== "admin" && isQualified ? (
                     <li>
                       <Link
