@@ -61,35 +61,35 @@ const AppRouter = () => {
             </>
           ),
         },
-        {
-          path: "hackathon/registration/SuccessRegistration",
-          element: (
-            <>
-              <NavBar />
-              <GuardedRoute
-                required={true}
-                component={SuccessRegistration}
-                allowedRoles={["admin", "participant"]}
-              />
-              <Toaster />
-            </>
-          ),
-        },
+        // {
+        //   path: "hackathon/registration/SuccessRegistration",
+        //   element: (
+        //     <>
+        //       <NavBar />
+        //       <GuardedRoute
+        //         required={true}
+        //         component={SuccessRegistration}
+        //         allowedRoles={["admin", "participant"]}
+        //       />
+        //       <Toaster />
+        //     </>
+        //   ),
+        // },
 
-        {
-          path: "hackathon/registration/SignInView",
-          element: (
-            <>
-              <NavBar />
-              <GuardedRoute
-                required={true}
-                component={SignInView}
-                allowedRoles={["admin", "participant"]}
-              />
-              <Toaster />
-            </>
-          ),
-        },
+        // {
+        //   path: "hackathon/registration/SignInView",
+        //   element: (
+        //     <>
+        //       <NavBar />
+        //       <GuardedRoute
+        //         required={true}
+        //         component={SignInView}
+        //         allowedRoles={["admin", "participant"]}
+        //       />
+        //       <Toaster />
+        //     </>
+        //   ),
+        // },
 
         {
           path: "hackathon/administration/PreselectionView",
@@ -293,24 +293,24 @@ const AppRouter = () => {
             </>
           ),
         },
-        // {
-        //   path: "hackathon/auth/SignInView",
-        //   element: (
-        //     <>
-        //       <SignInView />
-        //       <Toaster />
-        //     </>
-        //   ),
-        // },
-        // {
-        //   path: "hackathon/auth/SuccessRegistration",
-        //   element: (
-        //     <>
-        //       <SuccessRegistration />
-        //       <Toaster />
-        //     </>
-        //   ),
-        // },
+        {
+          path: "hackathon/auth/SignInView",
+          element: (
+            <>
+              <SignInView />
+              <Toaster />
+            </>
+          ),
+        },
+        {
+          path: "hackathon/auth/SuccessRegistration",
+          element: (
+            <>
+              <SuccessRegistration />
+              <Toaster />
+            </>
+          ),
+        },
       ],
     },
   ]);
