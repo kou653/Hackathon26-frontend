@@ -61,35 +61,35 @@ const AppRouter = () => {
             </>
           ),
         },
-        // {
-        //   path: "hackathon/registration/SuccessRegistration",
-        //   element: (
-        //     <>
-        //       <NavBar />
-        //       <GuardedRoute
-        //         required={true}
-        //         component={SuccessRegistration}
-        //         allowedRoles={["admin", "participant"]}
-        //       />
-        //       <Toaster />
-        //     </>
-        //   ),
-        // },
+        {
+          path: "hackathon/registration/SuccessRegistration",
+          element: (
+            <>
+              <NavBar />
+              <GuardedRoute
+                required={true}
+                component={SuccessRegistration}
+                allowedRoles={["admin", "participant"]}
+              />
+              <Toaster />
+            </>
+          ),
+        },
 
-        // {
-        //   path: "hackathon/registration/SignInView",
-        //   element: (
-        //     <>
-        //       <NavBar />
-        //       <GuardedRoute
-        //         required={true}
-        //         component={SignInView}
-        //         allowedRoles={["admin", "participant"]}
-        //       />
-        //       <Toaster />
-        //     </>
-        //   ),
-        // },
+        {
+          path: "hackathon/registration/SignInView",
+          element: (
+            <>
+              <NavBar />
+              <GuardedRoute
+                required={true}
+                component={SignInView}
+                allowedRoles={["admin", "participant"]}
+              />
+              <Toaster />
+            </>
+          ),
+        },
 
         {
           path: "hackathon/administration/PreselectionView",
