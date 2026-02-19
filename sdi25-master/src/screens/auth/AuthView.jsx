@@ -67,11 +67,11 @@ export default function AuthView() {
               type="button"
               route="/hackathon/auth/LogInView"
             />
-            <LinkButton
+            {/* <LinkButton
               label="Inscription"
               type="button"
               route="/hackathon/auth/SignInView"
-            />
+            /> */}
             {/* <LinkButton
               label="Jeu"
               type="button"

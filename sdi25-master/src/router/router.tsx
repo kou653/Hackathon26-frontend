@@ -293,24 +293,24 @@ const AppRouter = () => {
             </>
           ),
         },
-        {
-          path: "hackathon/auth/SignInView",
-          element: (
-            <>
-              <SignInView />
-              <Toaster />
-            </>
-          ),
-        },
-        {
-          path: "hackathon/auth/SuccessRegistration",
-          element: (
-            <>
-              <SuccessRegistration />
-              <Toaster />
-            </>
-          ),
-        },
+        // {
+        //   path: "hackathon/auth/SignInView",
+        //   element: (
+        //     <>
+        //       <SignInView />
+        //       <Toaster />
+        //     </>
+        //   ),
+        // },
+        // {
+        //   path: "hackathon/auth/SuccessRegistration",
+        //   element: (
+        //     <>
+        //       <SuccessRegistration />
+        //       <Toaster />
+        //     </>
+        //   ),
+        // },
       ],
     },
   ]);
