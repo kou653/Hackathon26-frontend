@@ -72,11 +72,11 @@ export default function AuthView() {
               type="button"
               route="/hackathon/auth/SignInView"
             />
-            {/* <LinkButton
+            <LinkButton
               label="Jeu"
               type="button"
               route="/hackathon/game/GameCountView"
-            /> */}
+            />
           </div>
           <div className="mt-28 max-w-[900px] mx-auto ">
             <Marquee className="w-5/6 text-white text-xl mt-24">
