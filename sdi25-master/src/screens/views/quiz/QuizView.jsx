@@ -19,7 +19,7 @@ const Quiz = () => {
   const [showResult, setShowResult] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [counter, setCounter] = useState(0);
-  const [duration] = useState(10);
+  const [duration] = useState(15);
   const intervalRef = useRef();
 
   const navigate = useNavigate();
