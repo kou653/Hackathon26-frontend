@@ -2,7 +2,9 @@ import React from "react";
 import Button from "../../components/ui/ButtonUi.tsx";
 
 export default function PrintView() {
-  const apiUrl = "/api/";
+  const apiBaseUrl = process.env.REACT_APP_API_URL
+    ? `${process.env.REACT_APP_API_URL}/api`
+    : "/api";
   return (
     <div className="md:p-9 p-4">
       <p>IMPRESSION DES LISTES D&apos;EQUIPES SELECTIONNEES</p>
@@ -11,7 +13,11 @@ export default function PrintView() {
           <div className="flex justify-between gap-4 items-center flex-1">
             <p>Equipes de niveau 1</p>
             <div className="max-w-lg">
-              <a target="blank" href={apiUrl + "/pdf/selectedteam/1"}>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${apiBaseUrl}/pdf/selectedteam/1`}
+              >
                 <Button
                   onClick={() => {
                     return null;
@@ -28,7 +34,11 @@ export default function PrintView() {
           <div className="flex justify-between gap-4 items-center flex-1">
             <p>Equipes de niveau 2 Devloppement</p>
             <div className="max-w-lg">
-              <a target="blank" href={apiUrl + "/pdf/selectedteam/2"}>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${apiBaseUrl}/pdf/selectedteam/2`}
+              >
                 <Button
                   onClick={() => {
                     return null;
@@ -47,7 +57,11 @@ export default function PrintView() {
           <div className="flex justify-between gap-4 items-center flex-1">
             <p>Equipes de niveau 2 Réseau & Telecom</p>
             <div className="max-w-lg">
-              <a target="blank" href={apiUrl + "/pdf/selectedteam/3"}>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${apiBaseUrl}/pdf/selectedteam/3`}
+              >
                 <Button
                   onClick={() => {
                     return null;
@@ -64,7 +78,11 @@ export default function PrintView() {
           <div className="flex justify-between gap-4 items-center flex-1">
             <p>Equipes de niveau 3 Sécurité</p>
             <div className="max-w-lg">
-              <a target="blank" href={apiUrl + "/pdf/selectedteam/6"}>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${apiBaseUrl}/pdf/selectedteam/6`}
+              >
                 <Button
                   onClick={() => {
                     return null;
@@ -83,7 +101,11 @@ export default function PrintView() {
           <div className="flex gap-4 items-center flex-1">
             <p>Equipes de niveau 3 Developpement</p>
             <div className="max-w-lg">
-              <a target="blank" href={apiUrl + "/pdf/selectedteam/4"}>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${apiBaseUrl}/pdf/selectedteam/4`}
+              >
                 <Button
                   onClick={() => {
                     return null;
@@ -100,7 +122,11 @@ export default function PrintView() {
           <div className="flex gap-4 items-center flex-1">
             <p>Equipes de niveau 3 Réseau & Telecom</p>
             <div className="max-w-lg">
-              <a target="blank" href={apiUrl + "/pdf/selectedteam/5"}>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${apiBaseUrl}/pdf/selectedteam/5`}
+              >
                 <Button
                   onClick={() => {
                     return null;
@@ -125,7 +151,11 @@ export default function PrintView() {
           <div className="flex justify-between gap-4 items-center flex-1">
             <p>Rep. Equipe par Salle</p>
             <div className="max-w-lg">
-              <a target="blank" href={apiUrl + "/pdf/repartition"}>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${apiBaseUrl}/pdf/repartition`}
+              >
                 <Button
                   onClick={() => {
                     return null;
@@ -142,7 +172,11 @@ export default function PrintView() {
           <div className="flex justify-between gap-4 items-center flex-1">
             <p>Commandes Collation</p>
             <div className="max-w-lg">
-              <a target="blank" href={apiUrl + "/pdf/commandes"}>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${apiBaseUrl}/pdf/commandes`}
+              >
                 <Button
                   onClick={() => {
                     return null;
