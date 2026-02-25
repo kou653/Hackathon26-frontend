@@ -1,17 +1,9 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { notify } from "../components/toast/toast.tsx";
-import secureLocalStorage from "react-secure-storage";
-import axios from "axios";
-
-const apiUrl = "/api";
+import api from "./axios";
 
 export const handleServiceGetMeal = async () => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/restauration/render`;
-    const response = await axios.get(uri);
+    const response = await api.get("/restauration/render");
     const status = response.data.status;
 
     switch (status) {
@@ -26,12 +18,8 @@ export const handleServiceGetMeal = async () => {
 };
 
 export const handleServiceCreateFood = async (data: any) => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/repas/create`;
-    const response = await axios.post(uri, data);
+    const response = await api.post("/repas/create", data);
     const status = response.data.status;
 
     switch (status) {
@@ -48,12 +36,8 @@ export const handleServiceCreateFood = async (data: any) => {
 };
 
 export const handleServiceCreateDrink = async (data: any) => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/collation/create`;
-    const response = await axios.post(uri, data);
+    const response = await api.post("/collation/create", data);
     const status = response.data.status;
 
     switch (status) {
@@ -70,12 +54,8 @@ export const handleServiceCreateDrink = async (data: any) => {
 };
 
 export const handleServiceDeleteFood = async (data: any) => {
-  axios.defaults.headers.common["Authorization"] =
-      "Bearer " + secureLocalStorage.getItem("session_token")!;
-  
   try {
-    const uri = `${apiUrl}/repas/delete`;
-    const response = await axios.post(uri, data);
+    const response = await api.post("/repas/delete", data);
     const status = response.data.status;
   
     switch (status) {
@@ -92,12 +72,8 @@ export const handleServiceDeleteFood = async (data: any) => {
 };
 
 export const handleServiceDeleteCollation = async (data: any) => {
-  axios.defaults.headers.common["Authorization"] =
-      "Bearer " + secureLocalStorage.getItem("session_token")!;
-  
   try {
-    const uri = `${apiUrl}/collation/delete`;
-    const response = await axios.post(uri, data);
+    const response = await api.post("/collation/delete", data);
     const status = response.data.status;
   
     switch (status) {
@@ -114,12 +90,8 @@ export const handleServiceDeleteCollation = async (data: any) => {
 };
 
 export const handleServiceGetcommand = async () => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/commandes/render`;
-    const response = await axios.get(uri);
+    const response = await api.get("/commandes/render");
     const status = response.data.status;
 
     switch (status) {
@@ -134,12 +106,8 @@ export const handleServiceGetcommand = async () => {
 };
 
 export const handleServiceResetcommand = async () => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/commandes/reset`;
-    const response = await axios.get(uri);
+    const response = await api.get("/commandes/reset");
     const status = response.data.status;
 
     switch (status) {
@@ -156,12 +124,8 @@ export const handleServiceResetcommand = async () => {
 };
 
 export const handleServiceParticipantGetData = async () => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/prestauration/render`;
-    const response = await axios.get(uri);
+    const response = await api.get("/prestauration/render");
     const status = response.data.status;
 
     switch (status) {
@@ -177,12 +141,8 @@ export const handleServiceParticipantGetData = async () => {
 };
 
 export const handleServiceCommand = async (data: object) => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/commande/make`;
-    const response = await axios.post(uri, data);
+    const response = await api.post("/commande/make", data);
     const status = response.data.status;
 
     switch (status) {
@@ -200,12 +160,8 @@ export const handleServiceCommand = async (data: object) => {
 };
 
 export const handleServiceScanCode = async (data: object) => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/restauration/soumission`;
-    const response = await axios.post(uri, data);
+    const response = await api.post("/restauration/soumission", data);
     const status = response.data.status;
 
     switch (status) {
@@ -222,12 +178,8 @@ export const handleServiceScanCode = async (data: object) => {
 };
 
 export const handleServiceAllRepas= async () => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + secureLocalStorage.getItem("session_token")!;
-
   try {
-    const uri = `${apiUrl}/allrepas/render`;
-    const response = await axios.get(uri);
+    const response = await api.get("/allrepas/render");
     const status = response.data.status;
 
     switch (status) {

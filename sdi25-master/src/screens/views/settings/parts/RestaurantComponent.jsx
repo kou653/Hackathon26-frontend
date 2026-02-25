@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import HashLoader from "react-spinners/HashLoader";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
+import { notify } from "../../../../components/toast/toast.tsx";
 
 import InputField from "../../../../components/ui/InputField.tsx";
 import Labelui from "../../../../components/ui/labelui.tsx";
@@ -152,13 +153,19 @@ export default function RestaurantComponent() {
 
   const handleFoodSubmit = async (event) => {
     event.preventDefault();
+    const libelle = foodValue.trim();
+    if (!libelle) {
+      notify("error", "Veuillez renseigner le nom du plat");
+      return;
+    }
     setIsLoading(true);
 
     const newFood = {
-      libelle: foodValue,
+      libelle,
     };
 
-    await handleServiceCreateFood(newFood);
+    const result = await handleServiceCreateFood(newFood);
+    if (result) setFoodValue("");
 
     getFullDataList();
     setIsLoading(false);
@@ -166,13 +173,19 @@ export default function RestaurantComponent() {
 
   const handleDrinkSubmit = async (event) => {
     event.preventDefault();
+    const libelle = drinkValue.trim();
+    if (!libelle) {
+      notify("error", "Veuillez renseigner le nom de la collation");
+      return;
+    }
     setIsLoading(true);
 
     const newDrink = {
-      libelle: drinkValue,
+      libelle,
     };
 
-    await handleServiceCreateDrink(newDrink);
+    const result = await handleServiceCreateDrink(newDrink);
+    if (result) setDrinkValue("");
 
     getFullDataList();
     setIsLoading(false);
