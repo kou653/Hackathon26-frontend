@@ -248,7 +248,7 @@ export default function NavBar() {
                       </Link>
                     </li>
                   ) : null}
-                      {userRole === "participant" ? (
+                  {userRole === "participant" ? (
                     <li>
                       <Link
                         to="/hackathon/administration/Restauration-for-participant"
