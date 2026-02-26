@@ -22,15 +22,15 @@ export default function RestaurantView() {
   async function handleGetCommandList() {
     setIsLoading(true);
     const result = await handleServiceGetcommand();
-    setCommandList(result);
+    setCommandList(Array.isArray(result) ? result : []);
     setIsLoading(false);
   }
 
   async function handleGetAllRepas() {
     setIsLoading(true);
     const result = await handleServiceAllRepas();
-    setAllRepas(result.repas);
-    setNbEaters(result.nbEaters);
+    setAllRepas(Array.isArray(result?.repas) ? result.repas : []);
+    setNbEaters(result?.nbEaters ?? 0);
     setIsLoading(false);
   }
 
@@ -45,7 +45,7 @@ export default function RestaurantView() {
 
   useEffect(() => {
     let isMounted = true;
-  
+
     const fetchData = async () => {
       setIsLoading(true);
       if (isMounted) {
@@ -54,9 +54,9 @@ export default function RestaurantView() {
       }
       setIsLoading(false);
     };
-  
+
     fetchData();
-  
+
     return () => {
       isMounted = false;
     };
@@ -73,10 +73,26 @@ export default function RestaurantView() {
           N
         </th>
         <th scope="col" className="px-6 py-3">
-          Libellé du plat
+          Participant
+        </th>
+        <th scope="col" className="px-6 py-3">
+          Repas
+        </th>
+        <th scope="col" className="px-6 py-3">
+          Collation
         </th>
       </tr>
     );
+  }
+
+  function getParticipantLabel(item) {
+    const participant = item?.participant ?? item?.etudiant ?? item?.user;
+    if (!participant) return "Participant non defini";
+
+    const nom = participant.nom ?? "";
+    const prenom = participant.prenom ?? "";
+    const fullName = `${nom} ${prenom}`.trim();
+    return fullName || participant.matricule || "Participant non defini";
   }
 
   function Items({ currentItems }) {
@@ -94,8 +110,10 @@ export default function RestaurantView() {
               >
                 {index + 1}
               </th>
+              <td className="px-6 py-4">{getParticipantLabel(item)}</td>
+              <td className="px-6 py-4">{item?.repas?.libelle ?? "Repas non defini"}</td>
               <td className="px-6 py-4">
-                {item.collation?.libelle ?? "Collation non definie"}
+                {item?.collation?.libelle ?? "Collation non definie"}
               </td>
             </tr>
           ))}
@@ -105,7 +123,7 @@ export default function RestaurantView() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isRead, setIsRead] = useState(false);
-  var [idTicket, setIdTicket] = useState("");
+  const [idTicket, setIdTicket] = useState("");
 
   const updateIsread = async () => {
     setIsLoading(true);
@@ -169,9 +187,8 @@ export default function RestaurantView() {
                 <p className="font-bold" key={`${element.libelle}-${index}`}>
                   {element.libelle} :{" "}
                   <span className="text-[#F94C10]">
-                    {" "}
-                    {element.nbEaten} / {nbEaters}{" "}
-                  </span>{" "}
+                    {element.nbEaten} / {nbEaters}
+                  </span>
                 </p>
               ))}
             </div>

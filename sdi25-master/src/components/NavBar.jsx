@@ -17,7 +17,6 @@ import React from "react";
 import Button from "./ui/ButtonUi.tsx";
 
 export default function NavBar() {
-  const isQualified = secureLocalStorage.getItem("user").team_qualified;
   const userRole = secureLocalStorage.getItem("user_role");
   const [isLeader, setIsLeader] = useState(false);
   const [isReady, setIsReady] = useState(false);
@@ -93,7 +92,7 @@ export default function NavBar() {
                           </Link>
                         </li>
                       ) : null}
-                      {userRole !== "admin" && isQualified ? (
+                      {userRole === "participant" ? (
                         <li>
                           <Link
                             to="/hackathon/administration/Restauration-for-participant"
@@ -249,7 +248,7 @@ export default function NavBar() {
                       </Link>
                     </li>
                   ) : null}
-                  {userRole !== "admin" && isQualified ? (
+                      {userRole === "participant" ? (
                     <li>
                       <Link
                         to="/hackathon/administration/Restauration-for-participant"
