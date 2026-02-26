@@ -94,7 +94,9 @@ export default function RestaurantView() {
               >
                 {index + 1}
               </th>
-              <td className="px-6 py-4">{item.collation.libelle}</td>
+              <td className="px-6 py-4">
+                {item.collation?.libelle ?? "Collation non definie"}
+              </td>
             </tr>
           ))}
       </>

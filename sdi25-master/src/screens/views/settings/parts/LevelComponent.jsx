@@ -132,15 +132,15 @@ export default function LevelComponent() {
                 scope="row"
                 className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
               >
-                {item.niveau.libelle}
+                {item.niveau?.libelle ?? "Niveau non defini"}
               </th>
               <td className="px-6 py-4">{item.libelle}</td>
               <td className="px-6 text-[#F94C10]">
                 <button
                   onClick={() =>
                     handleOpen(
-                      item.niveau.libelle,
-                      item.libelle,
+                      item.niveau?.libelle ?? "",
+                      item.libelle ?? "",
                       item.id,
                       item.esatic
                     )
