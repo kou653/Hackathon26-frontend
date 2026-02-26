@@ -76,6 +76,12 @@ export default function RestaurantView() {
           Participant
         </th>
         <th scope="col" className="px-6 py-3">
+          Equipe
+        </th>
+        <th scope="col" className="px-6 py-3">
+          Salle
+        </th>
+        <th scope="col" className="px-6 py-3">
           Repas
         </th>
         <th scope="col" className="px-6 py-3">
@@ -95,6 +101,18 @@ export default function RestaurantView() {
     return fullName || participant.matricule || "Participant non defini";
   }
 
+  function getTeamLabel(item) {
+    const team = item?.equipe ?? item?.team ?? item?.participant?.equipe;
+    if (!team) return "Equipe non definie";
+    return team.nom ?? team.libelle ?? "Equipe non definie";
+  }
+
+  function getRoomLabel(item) {
+    const room = item?.salle ?? item?.room ?? item?.participant?.salle;
+    if (!room) return "Salle non definie";
+    return room.libelle ?? room.nom ?? "Salle non definie";
+  }
+
   function Items({ currentItems }) {
     return (
       <>
@@ -111,6 +129,8 @@ export default function RestaurantView() {
                 {index + 1}
               </th>
               <td className="px-6 py-4">{getParticipantLabel(item)}</td>
+              <td className="px-6 py-4">{getTeamLabel(item)}</td>
+              <td className="px-6 py-4">{getRoomLabel(item)}</td>
               <td className="px-6 py-4">{item?.repas?.libelle ?? "Repas non defini"}</td>
               <td className="px-6 py-4">
                 {item?.collation?.libelle ?? "Collation non definie"}
