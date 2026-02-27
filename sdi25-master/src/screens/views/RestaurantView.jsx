@@ -145,6 +145,32 @@ export default function RestaurantView() {
     return room.libelle ?? room.nom ?? "Salle non definie";
   }
 
+  function getRepasLabel(item) {
+    const repasObject =
+      item?.repas ??
+      item?.meal ??
+      item?.repasCommande ??
+      item?.repas_commande;
+
+    if (repasObject?.libelle) return repasObject.libelle;
+
+    if (typeof item?.repas_libelle === "string" && item.repas_libelle.trim()) {
+      return item.repas_libelle;
+    }
+
+    if (typeof item?.repas === "string" && item.repas.trim()) {
+      return item.repas;
+    }
+
+    const repasId = item?.repasId ?? item?.repas_id;
+    if (repasId && Array.isArray(allrepas)) {
+      const matched = allrepas.find((repas) => String(repas.id) === String(repasId));
+      if (matched?.libelle) return matched.libelle;
+    }
+
+    return "Repas non defini";
+  }
+
   function Items({ currentItems }) {
     return (
       <>
@@ -163,7 +189,7 @@ export default function RestaurantView() {
               <td className="px-6 py-4">{getParticipantLabel(item)}</td>
               <td className="px-6 py-4">{getTeamLabel(item)}</td>
               <td className="px-6 py-4">{getRoomLabel(item)}</td>
-              <td className="px-6 py-4">{item?.repas?.libelle ?? "Repas non defini"}</td>
+              <td className="px-6 py-4">{getRepasLabel(item)}</td>
               <td className="px-6 py-4">
                 {item?.collation?.libelle ?? "Collation non definie"}
               </td>

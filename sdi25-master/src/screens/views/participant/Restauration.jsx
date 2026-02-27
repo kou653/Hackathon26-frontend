@@ -1,4 +1,5 @@
 import {
+  handleServiceGetMeal,
   handleServiceCommand,
   handleServiceParticipantGetData,
 } from "../../../services/restaurantService.tsx";
@@ -70,8 +71,14 @@ export default function Restauration() {
       equipe: teamName.trim(),
       salle,
     };
-    if (repasId) payload.repasId = repasId;
-    if (collationId) payload.collationId = collationId;
+    if (repasId) {
+      payload.repasId = repasId;
+      payload.repas_id = repasId;
+    }
+    if (collationId) {
+      payload.collationId = collationId;
+      payload.collation_id = collationId;
+    }
 
     const ok = await handleServiceCommand(payload);
     if (ok) {
@@ -119,6 +126,28 @@ export default function Restauration() {
       setListSalles(tempSalles);
     } else {
       setListSalles([]);
+    }
+
+    // Si le backend ne renvoie plus repas/collations apres une premiere commande,
+    // on recharge le menu global pour permettre la commande multiple.
+    if (!Array.isArray(result.repas) || !Array.isArray(result.collations)) {
+      const mealData = await handleServiceGetMeal();
+      if (Array.isArray(mealData?.repas)) {
+        setListRepas(
+          mealData.repas.map((item) => ({
+            value: item.id,
+            label: item.libelle,
+          }))
+        );
+      }
+      if (Array.isArray(mealData?.collations)) {
+        setListCollation(
+          mealData.collations.map((item) => ({
+            value: item.id,
+            label: item.libelle,
+          }))
+        );
+      }
     }
 
     if (result.commande || result.collation || result.repasCommande) {
