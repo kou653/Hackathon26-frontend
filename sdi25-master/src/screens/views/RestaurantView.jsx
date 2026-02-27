@@ -1,374 +1,299 @@
+import { CustomTabPanel, a11yProps } from "../../components/NavTabs";
+import { PaginatedItems } from "../../components/PageIndicator";
+import Button from "../../components/ui/ButtonUi.tsx";
+import { QrScanner } from "@yudiel/react-qr-scanner";
+import { useEffect, useState } from "react";
+import { Tab, Tabs } from "@mui/material";
+import Box from "@mui/material/Box";
+import React from "react";
 import {
-  handleServiceGetMeal,
-  handleServiceCommand,
-  handleServiceParticipantGetData,
-} from "../../../services/restaurantService.tsx";
-import Button from "../../../components/ui/ButtonUi.tsx";
-import SelectUi from "../../../components/ui/SelectUi.tsx";
-import { notify } from "../../../components/toast/toast.tsx";
-import React, { useEffect, useState } from "react";
-import secureLocalStorage from "react-secure-storage";
+  handleServiceAllRepas,
+  handleServiceGetcommand,
+  handleServiceResetcommand,
+  handleServiceScanCode,
+} from "../../services/restaurantService.tsx";
 
-export default function Restauration() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [order, setOrder] = useState({});
-  const [data, setData] = useState({});
+export default function RestaurantView() {
+  const [value, setValue] = React.useState(0);
+  const [commandList, setCommandList] = useState([]);
+  const [allrepas, setAllRepas] = useState([]);
+  const [nbEaters, setNbEaters] = useState(0);
 
-  const [roomValue, setRoomValue] = useState("");
+  async function handleGetCommandList(showLoader = true) {
+    if (showLoader) setIsLoading(true);
+    const result = await handleServiceGetcommand();
+    setCommandList(Array.isArray(result) ? result : []);
+    if (showLoader) setIsLoading(false);
+  }
 
-  const [listRepas, setListRepas] = useState([]);
-  const [repasValue, setRepasValue] = useState("");
-  const handleRepasChange = (selectedOption) => {
-    setRepasValue(selectedOption?.value ?? "");
-  };
-
-  const [listCollation, setListCollation] = useState([]);
-  const [collationValue, setCollationValue] = useState("");
-  const handleCollationChange = (selectedOption) => {
-    setCollationValue(selectedOption?.value ?? "");
-  };
-
-  const [listSalles, setListSalles] = useState([]);
-  const handleSalleChange = (selectedOption) => {
-    setRoomValue(selectedOption?.value ?? "");
-  };
-
-  const getOrderLabel = (payload) => {
-    const repasLabel =
-      payload?.commande?.repas?.libelle ?? payload?.repas?.libelle ?? "";
-    const collationLabel =
-      payload?.commande?.collation?.libelle ?? payload?.collation?.libelle ?? "";
-
-    if (repasLabel && collationLabel) return `${repasLabel} + ${collationLabel}`;
-    if (repasLabel) return repasLabel;
-    if (collationLabel) return collationLabel;
-    return "commande enregistree";
-  };
-
-  const resolveParticipantName = () => {
-    const rawUser = secureLocalStorage.getItem("user");
-    const decodedUser = rawUser?.etudiant ?? rawUser ?? {};
-    const nom = (decodedUser?.nom ?? "").trim();
-    return nom || "Participant";
-  };
-
-  const resolveTeamName = () => {
-    const decodedTeam = secureLocalStorage.getItem("team");
-    const rawUser = secureLocalStorage.getItem("user");
-    const decodedUser = rawUser?.etudiant ?? rawUser ?? {};
-    const participantFromData = data?.participant ?? data?.etudiant ?? data?.user ?? {};
-
-    return (
-      decodedTeam?.find?.((element) => element?.chef === 1)?.groupe?.nom ??
-      decodedTeam?.find?.((element) => element?.equipe?.nom)?.equipe?.nom ??
-      decodedTeam?.[0]?.groupe?.nom ??
-      decodedTeam?.[0]?.equipe?.nom ??
-      decodedUser?.groupe?.nom ??
-      decodedUser?.equipe?.nom ??
-      participantFromData?.groupe?.nom ??
-      participantFromData?.equipe?.nom ??
-      data?.equipe?.nom ??
-      data?.team?.nom ??
-      (typeof data?.equipe === "string" ? data.equipe : "") ??
-      (typeof data?.team === "string" ? data.team : "") ??
-      "Equipe non definie"
-    );
-  };
-
-  const resolveRoomValue = () => {
-    if (String(roomValue ?? "").trim()) return roomValue;
-
-    const roomFromData =
-      data?.salle?.id ??
-      data?.room?.id ??
-      data?.participant?.salle?.id ??
-      data?.participant?.room?.id ??
-      data?.salle?.libelle ??
-      data?.room?.libelle ??
-      data?.participant?.salle?.libelle ??
-      data?.participant?.room?.libelle ??
-      data?.salle ??
-      data?.room;
-
-    if (String(roomFromData ?? "").trim()) return roomFromData;
-
-    if (Array.isArray(listSalles) && listSalles.length === 1) {
-      return listSalles[0]?.value ?? "";
-    }
-
-    return "";
-  };
-
-  const handleCommand = async () => {
-    const rawUser = secureLocalStorage.getItem("user");
-    const decodedUser = rawUser?.etudiant ?? rawUser ?? {};
-    const participantName = resolveParticipantName();
-    const teamName = resolveTeamName();
-    const selectedRoomValue = resolveRoomValue();
-
-    if (!String(selectedRoomValue ?? "").trim()) {
-      notify("error", "Veuillez choisir votre salle");
-      return;
-    }
-
-    if (!repasValue && !collationValue) {
-      notify("error", "Choisissez au moins un repas ou une collation");
-      return;
-    }
-
+  async function handleGetAllRepas() {
     setIsLoading(true);
-    const repasId = repasValue ? Number(repasValue) : null;
-    const collationId = collationValue ? Number(collationValue) : null;
-
-    const salle =
-      typeof selectedRoomValue === "number" || /^\d+$/.test(String(selectedRoomValue))
-        ? Number(selectedRoomValue)
-        : String(selectedRoomValue).trim();
-
-    const payload = {
-      nom: participantName.trim(),
-      equipe: teamName.trim(),
-      salle,
-    };
-
-    const participantId =
-      decodedUser?.id ??
-      decodedUser?.etudiantId ??
-      decodedUser?.participantId ??
-      null;
-    const matricule = decodedUser?.matricule ?? null;
-    const prenom = decodedUser?.prenom ?? null;
-
-    if (participantId) {
-      payload.participantId = participantId;
-      payload.participant_id = participantId;
-      payload.etudiantId = participantId;
-      payload.userId = participantId;
-      payload.user_id = participantId;
-    }
-    if (matricule) {
-      payload.matricule = matricule;
-      payload.participantMatricule = matricule;
-    }
-    if (prenom) {
-      payload.prenom = prenom;
-    }
-    if (repasId) {
-      payload.repasId = repasId;
-      payload.repas_id = repasId;
-    }
-    if (collationId) {
-      payload.collationId = collationId;
-      payload.collation_id = collationId;
-    }
-
-    const ok = await handleServiceCommand(payload);
-    if (ok) {
-      setRepasValue("");
-      setCollationValue("");
-      await getData();
-    }
-    setIsLoading(false);
-  };
-
-  async function getData() {
-    setIsLoading(true);
-
-    const result = await handleServiceParticipantGetData();
-    if (!result) {
-      setIsLoading(false);
-      return;
-    }
-
-    if (Array.isArray(result.repas)) {
-      const tempRepas = result.repas.map((item) => ({
-        value: item.id,
-        label: item.libelle,
-      }));
-      setListRepas(tempRepas);
-    } else {
-      setListRepas([]);
-    }
-
-    if (Array.isArray(result.collations)) {
-      const tempCollation = result.collations.map((item) => ({
-        value: item.id,
-        label: item.libelle,
-      }));
-      setListCollation(tempCollation);
-    } else {
-      setListCollation([]);
-    }
-
-    if (Array.isArray(result.salles)) {
-      const tempSalles = result.salles.map((item) => ({
-        value: item.id ?? item.libelle,
-        label: item.libelle ?? String(item.id),
-      }));
-      setListSalles(tempSalles);
-    } else {
-      setListSalles([]);
-    }
-
-    // Si le backend ne renvoie plus repas/collations apres une premiere commande,
-    // on recharge le menu global pour permettre la commande multiple.
-    if (!Array.isArray(result.repas) || !Array.isArray(result.collations)) {
-      const mealData = await handleServiceGetMeal();
-      if (Array.isArray(mealData?.repas)) {
-        setListRepas(
-          mealData.repas.map((item) => ({
-            value: item.id,
-            label: item.libelle,
-          }))
-        );
-      }
-      if (Array.isArray(mealData?.collations)) {
-        setListCollation(
-          mealData.collations.map((item) => ({
-            value: item.id,
-            label: item.libelle,
-          }))
-        );
-      }
-    }
-
-    const rawUser = secureLocalStorage.getItem("user");
-    const decodedUser = rawUser?.etudiant ?? rawUser ?? {};
-    const connectedUserId = decodedUser?.id ?? decodedUser?.etudiantId ?? null;
-    const connectedMatricule = decodedUser?.matricule ?? null;
-
-    const rawOrders = Array.isArray(result?.commandes)
-      ? result.commandes
-      : Array.isArray(result?.orders)
-        ? result.orders
-        : [];
-
-    if (rawOrders.length > 0) {
-      const connectedOrder = rawOrders.find((item) => {
-        const participant = item?.participant ?? item?.etudiant ?? item?.user ?? {};
-        const participantId =
-          participant?.id ??
-          item?.participantId ??
-          item?.participant_id ??
-          item?.etudiantId ??
-          item?.userId ??
-          null;
-        const participantMatricule =
-          participant?.matricule ??
-          item?.matricule ??
-          item?.participantMatricule ??
-          null;
-
-        if (connectedUserId && participantId) {
-          return String(connectedUserId) === String(participantId);
-        }
-        if (connectedMatricule && participantMatricule) {
-          return String(connectedMatricule) === String(participantMatricule);
-        }
-        return false;
-      });
-
-      if (connectedOrder) {
-        setOrder({
-          commande: connectedOrder,
-          collation: connectedOrder?.collation,
-          repas: connectedOrder?.repas ?? connectedOrder?.repasCommande,
-        });
-      } else {
-        setOrder({});
-      }
-    } else if (result.commande || result.collation || result.repasCommande) {
-      setOrder({
-        commande: result.commande,
-        collation: result.collation,
-        repas: result.repasCommande,
-      });
-    } else {
-      setOrder({});
-    }
-
-    setData(result);
+    const result = await handleServiceAllRepas();
+    setAllRepas(Array.isArray(result?.repas) ? result.repas : []);
+    setNbEaters(result?.nbEaters ?? 0);
     setIsLoading(false);
   }
 
+  const handleResetCommandList = async () => {
+    setIsLoading(true);
+    const result = await handleServiceResetcommand();
+    if (result) {
+      handleGetCommandList();
+    }
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    getData();
+    let isMounted = true;
+
+    const fetchData = async () => {
+      setIsLoading(true);
+      if (isMounted) {
+        await handleGetCommandList();
+        await handleGetAllRepas();
+      }
+      setIsLoading(false);
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {
-    if (!String(roomValue ?? "").trim() && Array.isArray(listSalles) && listSalles.length === 1) {
-      setRoomValue(listSalles[0]?.value ?? "");
+    const interval = setInterval(() => {
+      handleGetCommandList(false);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  function TableHeader() {
+    return (
+      <tr>
+        <th scope="col" className="px-6 py-3">
+          N
+        </th>
+        <th scope="col" className="px-6 py-3">
+          Participant
+        </th>
+        <th scope="col" className="px-6 py-3">
+          Equipe
+        </th>
+        <th scope="col" className="px-6 py-3">
+          Salle
+        </th>
+        <th scope="col" className="px-6 py-3">
+          Repas
+        </th>
+        <th scope="col" className="px-6 py-3">
+          Collation
+        </th>
+      </tr>
+    );
+  }
+
+  function getParticipantLabel(item) {
+    const participant = item?.participant ?? item?.etudiant ?? item?.user;
+    if (!participant) {
+      return (
+        item?.participant_nom ??
+        item?.nomParticipant ??
+        item?.participantName ??
+        item?.nom ??
+        "Participant non defini"
+      );
     }
-  }, [listSalles, roomValue]);
+
+    const nom = participant.nom ?? "";
+    const prenom = participant.prenom ?? "";
+    const fullName = `${nom} ${prenom}`.trim();
+    return fullName || participant.matricule || "Participant non defini";
+  }
+
+  function getTeamLabel(item) {
+    const team = item?.equipe ?? item?.team ?? item?.participant?.equipe;
+    if (!team) {
+      return (
+        item?.equipe_nom ??
+        item?.nomEquipe ??
+        item?.teamName ??
+        item?.equipe ??
+        "Equipe non definie"
+      );
+    }
+    return team.nom ?? team.libelle ?? "Equipe non definie";
+  }
+
+  function getRoomLabel(item) {
+    const room = item?.salle ?? item?.room ?? item?.participant?.salle;
+    if (!room) {
+      return (
+        item?.salle_nom ??
+        item?.nomSalle ??
+        item?.roomName ??
+        item?.salle ??
+        "Salle non definie"
+      );
+    }
+    return room.libelle ?? room.nom ?? "Salle non definie";
+  }
+
+  function getRepasLabel(item) {
+    const repasObject =
+      item?.repas ??
+      item?.meal ??
+      item?.repasCommande ??
+      item?.repas_commande;
+
+    if (repasObject?.libelle) return repasObject.libelle;
+
+    if (typeof item?.repas_libelle === "string" && item.repas_libelle.trim()) {
+      return item.repas_libelle;
+    }
+
+    if (typeof item?.repas === "string" && item.repas.trim()) {
+      return item.repas;
+    }
+
+    const repasId = item?.repasId ?? item?.repas_id;
+    if (repasId && Array.isArray(allrepas)) {
+      const matched = allrepas.find((repas) => String(repas.id) === String(repasId));
+      if (matched?.libelle) return matched.libelle;
+    }
+
+    return "Repas non defini";
+  }
+
+  function Items({ currentItems }) {
+    return (
+      <>
+        {currentItems &&
+          currentItems.map((item, index) => (
+            <tr
+              key={index}
+              className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700"
+            >
+              <th
+                scope="row"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+              >
+                {index + 1}
+              </th>
+              <td className="px-6 py-4">{getParticipantLabel(item)}</td>
+              <td className="px-6 py-4">{getTeamLabel(item)}</td>
+              <td className="px-6 py-4">{getRoomLabel(item)}</td>
+              <td className="px-6 py-4">{getRepasLabel(item)}</td>
+              <td className="px-6 py-4">
+                {item?.collation?.libelle ?? "Collation non definie"}
+              </td>
+            </tr>
+          ))}
+      </>
+    );
+  }
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRead, setIsRead] = useState(false);
+  const [idTicket, setIdTicket] = useState("");
+
+  const updateIsread = async () => {
+    setIsLoading(true);
+    const data = {
+      qrcodeValue: idTicket,
+    };
+    setIsLoading(false);
+    setIsRead(false);
+    await handleServiceScanCode(data);
+  };
+
+  function makeReady(result) {
+    setIsRead(true);
+    setIdTicket(result);
+  }
 
   return (
-    <div className="max-w-xl mx-auto md:py-24 py-4 px-4">
-      {!isLoading ? (
-        <div className="flex flex-col gap-6 items-center w-full">
-          <h1 className="font-bold text-xl text-center my-6 text-[#F94C10]">
-            Commandez votre restauration
-          </h1>
-          <div className="w-full max-w-xl">
-            <div className="flex flex-col gap-4">
-              {listSalles.length > 0 ? (
-                <div className="w-full">
-                  <SelectUi
-                    placeholder="Choisissez votre salle"
-                    options={listSalles}
-                    filterValue={roomValue}
-                    onChange={handleSalleChange}
-                  />
-                </div>
-              ) : (
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                  placeholder="Salle"
-                  value={roomValue}
-                  onChange={(event) => setRoomValue(event.target.value)}
-                />
-              )}
-
-              {listRepas.length !== 0 ? (
-                <div className="w-full">
-                  <SelectUi
-                    placeholder="Choisissez un repas"
-                    options={listRepas}
-                    filterValue={repasValue}
-                    onChange={handleRepasChange}
-                  />
-                </div>
-              ) : null}
-              {listCollation.length !== 0 ? (
-                <div className="w-full">
-                  <SelectUi
-                    placeholder="Choisissez une collation"
-                    options={listCollation}
-                    filterValue={collationValue}
-                    onChange={handleCollationChange}
-                  />
-                </div>
-              ) : null}
-              {listCollation.length !== 0 || listRepas.length !== 0 ? (
-                <div className="mt-2">
-                  <Button
-                    label="Commander"
-                    onClick={() => handleCommand()}
-                    isDisable={false}
-                    isLoading={isLoading}
-                    isReady={true}
-                  />
-                </div>
-              ) : null}
-            </div>
+    <div className="md:p-9">
+      <Box sx={{ width: "100%" }}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            scrollButtons={true}
+            variant="scrollable"
+            allowScrollButtonsMobile
+          >
+            <Tab label="Commandes" {...a11yProps(0)} />
+            <Tab label="Restaurant" {...a11yProps(1)} />
+          </Tabs>
+        </Box>
+        <CustomTabPanel value={value} index={0}>
+          <div className="flex flex-col gap-6">
+            <Button
+              onClick={handleResetCommandList}
+              label="Supprimer toutes les commandes"
+              isDisable={false}
+              isReady={true}
+              isLoading={false}
+            />
+            {Array.isArray(commandList) && commandList.length !== 0 ? (
+              <PaginatedItems
+                itemsPerPage={4}
+                item={commandList}
+                Items={Items}
+                tableHeader={TableHeader}
+              />
+            ) : (
+              "Pas de commandes"
+            )}
           </div>
-          {order?.commande || order?.repas || order?.collation ? (
-            <div className="text-sm text-gray-600">
-              Derniere commande: {getOrderLabel(order)}
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={1}>
+          <div className="flex flex-col gap-9">
+            <div className="text-left text-2xl font-bold">
+              Scannez le code Qr sur le ticket
             </div>
-          ) : null}
-        </div>
-      ) : null}
+
+            <div>
+              {allrepas.map((element, index) => (
+                <p className="font-bold" key={`${element.libelle}-${index}`}>
+                  {element.libelle} :{" "}
+                  <span className="text-[#F94C10]">
+                    {element.nbEaten} / {nbEaters}
+                  </span>
+                </p>
+              ))}
+            </div>
+
+            <QrScanner
+              className="w-full"
+              scanDelay={2000}
+              key="environment"
+              constraints={{
+                facingMode: "environment",
+              }}
+              onDecode={(result) => makeReady(result)}
+              onError={(error) => console.log(error?.message)}
+            />
+
+            {isRead ? (
+              <Button
+                onClick={() => updateIsread()}
+                label="valider"
+                isDisable={!isRead}
+                isReady={true}
+                isLoading={isLoading}
+              />
+            ) : null}
+          </div>
+        </CustomTabPanel>
+      </Box>
     </div>
   );
 }
