@@ -48,18 +48,8 @@ export default function Restauration() {
   const resolveParticipantName = () => {
     const rawUser = secureLocalStorage.getItem("user");
     const decodedUser = rawUser?.etudiant ?? rawUser ?? {};
-    const participantFromData = data?.participant ?? data?.etudiant ?? data?.user ?? {};
-
-    const nom = decodedUser?.nom ?? participantFromData?.nom ?? "";
-    const prenom = decodedUser?.prenom ?? participantFromData?.prenom ?? "";
-    const fullName = `${nom} ${prenom}`.trim();
-
-    return (
-      fullName ||
-      participantFromData?.matricule ||
-      decodedUser?.matricule ||
-      "Participant"
-    );
+    const nom = (decodedUser?.nom ?? "").trim();
+    return nom || "Participant";
   };
 
   const resolveTeamName = () => {

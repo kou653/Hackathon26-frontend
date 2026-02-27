@@ -203,4 +203,20 @@ export const handleServiceAllRepas= async () => {
   }
 };
 
+export const handleServiceGetRoomsForRestaurant = async () => {
+  try {
+    const response = await api.get("/salle/render");
+    const status = response.data.status;
+
+    switch (status) {
+    case true:
+      return response.data?.data?.salles ?? [];
+    case false:
+      return [];
+    }
+  } catch (error) {
+    return [];
+  }
+};
+
 

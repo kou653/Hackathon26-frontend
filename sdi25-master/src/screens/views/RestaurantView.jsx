@@ -9,6 +9,7 @@ import React from "react";
 import {
   handleServiceAllRepas,
   handleServiceGetcommand,
+  handleServiceGetRoomsForRestaurant,
   handleServiceResetcommand,
   handleServiceScanCode,
 } from "../../services/restaurantService.tsx";
@@ -17,6 +18,7 @@ export default function RestaurantView() {
   const [value, setValue] = React.useState(0);
   const [commandList, setCommandList] = useState([]);
   const [allrepas, setAllRepas] = useState([]);
+  const [roomsList, setRoomsList] = useState([]);
   const [nbEaters, setNbEaters] = useState(0);
 
   async function handleGetCommandList(showLoader = true) {
@@ -32,6 +34,11 @@ export default function RestaurantView() {
     setAllRepas(Array.isArray(result?.repas) ? result.repas : []);
     setNbEaters(result?.nbEaters ?? 0);
     setIsLoading(false);
+  }
+
+  async function handleGetRooms() {
+    const result = await handleServiceGetRoomsForRestaurant();
+    setRoomsList(Array.isArray(result) ? result : []);
   }
 
   const handleResetCommandList = async () => {
@@ -51,6 +58,7 @@ export default function RestaurantView() {
       if (isMounted) {
         await handleGetCommandList();
         await handleGetAllRepas();
+        await handleGetRooms();
       }
       setIsLoading(false);
     };
@@ -133,16 +141,39 @@ export default function RestaurantView() {
 
   function getRoomLabel(item) {
     const room = item?.salle ?? item?.room ?? item?.participant?.salle;
-    if (!room) {
-      return (
-        item?.salle_nom ??
-        item?.nomSalle ??
-        item?.roomName ??
-        item?.salle ??
-        "Salle non definie"
-      );
+    if (room && typeof room === "object") {
+      return room.libelle ?? room.nom ?? "Salle non definie";
     }
-    return room.libelle ?? room.nom ?? "Salle non definie";
+
+    const rawRoomValue =
+      room ??
+      item?.salle_id ??
+      item?.room_id ??
+      item?.participant?.salle_id ??
+      item?.participant?.room_id ??
+      item?.salle_nom ??
+      item?.nomSalle ??
+      item?.roomName ??
+      item?.salle;
+
+    if (typeof rawRoomValue === "string" && rawRoomValue.trim() && !/^\d+$/.test(rawRoomValue.trim())) {
+      return rawRoomValue;
+    }
+
+    const normalizedId =
+      typeof rawRoomValue === "number"
+        ? rawRoomValue
+        : /^\d+$/.test(String(rawRoomValue ?? ""))
+          ? Number(rawRoomValue)
+          : null;
+
+    if (normalizedId !== null) {
+      const matchedRoom = roomsList.find((oneRoom) => String(oneRoom?.id) === String(normalizedId));
+      if (matchedRoom?.libelle) return matchedRoom.libelle;
+      if (matchedRoom?.nom) return matchedRoom.nom;
+    }
+
+    return "Salle non definie";
   }
 
   function getRepasLabel(item) {
