@@ -145,12 +145,47 @@ export default function RestaurantView() {
       return room.libelle ?? room.nom ?? "Salle non definie";
     }
 
+    const explicitRoomLabel =
+      item?.salleLibelle ??
+      item?.salle_libelle ??
+      item?.salle_nom ??
+      item?.nomSalle ??
+      item?.roomName ??
+      item?.roomLabel ??
+      item?.classe ??
+      item?.classeLibelle ??
+      item?.classLabel ??
+      item?.participant?.salleLibelle ??
+      item?.participant?.salle_nom ??
+      item?.participant?.nomSalle ??
+      item?.participant?.roomName ??
+      item?.participant?.classe?.libelle ??
+      item?.participant?.classe?.nom ??
+      item?.participant?.class?.libelle ??
+      item?.participant?.class?.nom;
+
+    if (
+      typeof explicitRoomLabel === "string" &&
+      explicitRoomLabel.trim() &&
+      !/^\d+$/.test(explicitRoomLabel.trim())
+    ) {
+      return explicitRoomLabel.trim();
+    }
+
     const rawRoomValue =
       room ??
       item?.salle_id ??
+      item?.salleId ??
       item?.room_id ??
+      item?.roomId ??
+      item?.classe_id ??
+      item?.classeId ??
+      item?.class_id ??
+      item?.classId ??
       item?.participant?.salle_id ??
+      item?.participant?.salleId ??
       item?.participant?.room_id ??
+      item?.participant?.roomId ??
       item?.salle_nom ??
       item?.nomSalle ??
       item?.roomName ??

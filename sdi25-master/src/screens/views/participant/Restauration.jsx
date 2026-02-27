@@ -15,6 +15,7 @@ export default function Restauration() {
   const [data, setData] = useState({});
 
   const [roomValue, setRoomValue] = useState("");
+  const [roomLabel, setRoomLabel] = useState("");
 
   const [listRepas, setListRepas] = useState([]);
   const [repasValue, setRepasValue] = useState("");
@@ -31,6 +32,7 @@ export default function Restauration() {
   const [listSalles, setListSalles] = useState([]);
   const handleSalleChange = (selectedOption) => {
     setRoomValue(selectedOption?.value ?? "");
+    setRoomLabel(selectedOption?.label ?? "");
   };
 
   const getOrderLabel = (payload) => {
@@ -99,12 +101,33 @@ export default function Restauration() {
     return "";
   };
 
+  const resolveRoomLabel = (selectedRoomValue) => {
+    if (String(roomLabel ?? "").trim()) return String(roomLabel).trim();
+
+    const matchedRoom = Array.isArray(listSalles)
+      ? listSalles.find(
+        (item) => String(item?.value ?? "") === String(selectedRoomValue ?? "")
+      )
+      : null;
+
+    if (String(matchedRoom?.label ?? "").trim()) {
+      return String(matchedRoom.label).trim();
+    }
+
+    if (typeof selectedRoomValue === "string" && selectedRoomValue.trim() && !/^\d+$/.test(selectedRoomValue.trim())) {
+      return selectedRoomValue.trim();
+    }
+
+    return "";
+  };
+
   const handleCommand = async () => {
     const rawUser = secureLocalStorage.getItem("user");
     const decodedUser = rawUser?.etudiant ?? rawUser ?? {};
     const participantName = resolveParticipantName();
     const teamName = resolveTeamName();
     const selectedRoomValue = resolveRoomValue();
+    const selectedRoomLabel = resolveRoomLabel(selectedRoomValue);
 
     if (!String(selectedRoomValue ?? "").trim()) {
       notify("error", "Veuillez choisir votre salle");
@@ -130,6 +153,20 @@ export default function Restauration() {
       equipe: teamName.trim(),
       salle,
     };
+
+    if (selectedRoomLabel) {
+      payload.salleLibelle = selectedRoomLabel;
+      payload.salle_nom = selectedRoomLabel;
+      payload.nomSalle = selectedRoomLabel;
+      payload.roomName = selectedRoomLabel;
+      payload.roomLabel = selectedRoomLabel;
+      payload.classe = selectedRoomLabel;
+    }
+
+    if (typeof salle === "number") {
+      payload.salleId = salle;
+      payload.salle_id = salle;
+    }
 
     const participantId =
       decodedUser?.id ??
@@ -166,6 +203,7 @@ export default function Restauration() {
     if (ok) {
       setRepasValue("");
       setCollationValue("");
+      setRoomLabel("");
       await getData();
     }
     setIsLoading(false);
@@ -206,6 +244,15 @@ export default function Restauration() {
         label: item.libelle ?? String(item.id),
       }));
       setListSalles(tempSalles);
+
+      if (!String(roomLabel ?? "").trim() && String(roomValue ?? "").trim()) {
+        const matchedRoom = tempSalles.find(
+          (item) => String(item?.value ?? "") === String(roomValue ?? "")
+        );
+        if (matchedRoom?.label) {
+          setRoomLabel(matchedRoom.label);
+        }
+      }
     } else {
       setListSalles([]);
     }
@@ -298,8 +345,9 @@ export default function Restauration() {
   useEffect(() => {
     if (!String(roomValue ?? "").trim() && Array.isArray(listSalles) && listSalles.length === 1) {
       setRoomValue(listSalles[0]?.value ?? "");
+      setRoomLabel(listSalles[0]?.label ?? "");
     }
-  }, [listSalles, roomValue]);
+  }, [listSalles, roomValue, roomLabel]);
 
   return (
     <div className="max-w-xl mx-auto md:py-24 py-4 px-4">
