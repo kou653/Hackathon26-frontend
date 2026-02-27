@@ -158,8 +158,13 @@ export const handleServiceCommand = async (data: object) => {
       notify("error", response.data.message || "Quelque chose a mal tourné");
       return false;
     }
-  } catch (error) {
-    notify("error", "Une erreur s'est produite !");
+  } catch (error: any) {
+    const message =
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||
+      "Une erreur s'est produite !";
+    notify("error", message);
+    return false;
   }
 };
 
@@ -197,4 +202,5 @@ export const handleServiceAllRepas= async () => {
     notify("error", "Une erreur s'est produite !");
   }
 };
+
 

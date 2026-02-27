@@ -60,15 +60,18 @@ export default function Restauration() {
     const repasId = repasValue ? Number(repasValue) : null;
     const collationId = collationValue ? Number(collationValue) : null;
 
-    const salle = String(roomValue).trim();
+    const salle =
+      typeof roomValue === "number" || /^\d+$/.test(String(roomValue))
+        ? Number(roomValue)
+        : String(roomValue).trim();
 
     const payload = {
       nom: participantName.trim(),
       equipe: teamName.trim(),
       salle,
-      repasId,
-      collationId,
     };
+    if (repasId) payload.repasId = repasId;
+    if (collationId) payload.collationId = collationId;
 
     const ok = await handleServiceCommand(payload);
     if (ok) {
