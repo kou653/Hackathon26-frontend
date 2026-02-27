@@ -115,7 +115,7 @@ export const handleServiceResetcommand = async () => {
       notify("success", "les commandes on bien été supprimées");
       return true;
     case false:
-      notify("error", "Quelque chose a mal tourné");
+      notify("error", response.data.message || "Quelque chose a mal tourné");
       return false;
     }
   } catch (error) {
@@ -132,7 +132,7 @@ export const handleServiceParticipantGetData = async () => {
     case true:
       return response.data.data;
     case false:
-      notify("error", "Quelque chose a mal tourné");
+      notify("error", response.data.message || "Quelque chose a mal tourné");
       return false;
     }
   } catch (error) {
@@ -150,11 +150,10 @@ export const handleServiceCommand = async (data: object) => {
       notify("success", "Votre commande a bien été enregistée");
       return true;
     case false:
-      notify("error", "Quelque chose a mal tourné");
+      notify("error", response.data.message || "Quelque chose a mal tourné");
       return false;
     }
   } catch (error) {
-    alert(error);
     notify("error", "Une erreur s'est produite !");
   }
 };
@@ -193,3 +192,4 @@ export const handleServiceAllRepas= async () => {
     notify("error", "Une erreur s'est produite !");
   }
 };
+

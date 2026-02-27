@@ -43,12 +43,22 @@ export default function Restauration() {
     }
 
     setIsLoading(true);
-    const payload = {};
-    if (repasValue) payload.repasId = repasValue;
-    if (collationValue) payload.collationId = collationValue;
+    const repasId = repasValue ? Number(repasValue) : null;
+    const collationId = collationValue ? Number(collationValue) : null;
 
-    await handleServiceCommand(payload);
-    await getData();
+    // Compatibilite API: certains backends attendent camelCase, d'autres snake_case.
+    const payload = {
+      repasId,
+      collationId,
+      repas_id: repasId,
+      collation_id: collationId,
+      qrcodeValue: data?.qrcodeValue ?? null,
+    };
+
+    const ok = await handleServiceCommand(payload);
+    if (ok) {
+      await getData();
+    }
     setIsLoading(false);
   };
 
