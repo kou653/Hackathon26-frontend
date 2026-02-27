@@ -7,14 +7,13 @@ import Button from "../../../components/ui/ButtonUi.tsx";
 import SelectUi from "../../../components/ui/SelectUi.tsx";
 import { notify } from "../../../components/toast/toast.tsx";
 import React, { useEffect, useState } from "react";
+import secureLocalStorage from "react-secure-storage";
 
 export default function Restauration() {
   const [isLoading, setIsLoading] = useState(false);
   const [order, setOrder] = useState({});
   const [data, setData] = useState({});
 
-  const [participantName, setParticipantName] = useState("");
-  const [teamName, setTeamName] = useState("");
   const [roomValue, setRoomValue] = useState("");
 
   const [listRepas, setListRepas] = useState([]);
@@ -47,8 +46,25 @@ export default function Restauration() {
   };
 
   const handleCommand = async () => {
-    if (!participantName.trim() || !teamName.trim() || !String(roomValue).trim()) {
-      notify("error", "Renseignez nom, equipe et salle");
+    const decodedUser = secureLocalStorage.getItem("user")?.etudiant;
+    const decodedTeam = secureLocalStorage.getItem("team");
+
+    const participantName = `${decodedUser?.nom ?? ""} ${decodedUser?.prenom ?? ""}`.trim();
+    const teamName =
+      decodedTeam?.find?.((element) => element?.chef === 1)?.groupe?.nom ??
+      decodedTeam?.find?.((element) => element?.equipe?.nom)?.equipe?.nom ??
+      decodedTeam?.[0]?.groupe?.nom ??
+      decodedTeam?.[0]?.equipe?.nom ??
+      decodedUser?.groupe?.nom ??
+      decodedUser?.equipe?.nom ??
+      data?.equipe?.nom ??
+      data?.team?.nom ??
+      (typeof data?.equipe === "string" ? data.equipe : "") ??
+      (typeof data?.team === "string" ? data.team : "") ??
+      "";
+
+    if (!participantName || !teamName || !String(roomValue).trim()) {
+      notify("error", "Impossible de retrouver nom, equipe ou salle");
       return;
     }
 
@@ -177,20 +193,6 @@ export default function Restauration() {
           </h1>
           <div className="w-full max-w-xl">
             <div className="flex flex-col gap-4">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                placeholder="Votre nom complet"
-                value={participantName}
-                onChange={(event) => setParticipantName(event.target.value)}
-              />
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                placeholder="Nom de votre equipe"
-                value={teamName}
-                onChange={(event) => setTeamName(event.target.value)}
-              />
               {listSalles.length > 0 ? (
                 <div className="w-full">
                   <SelectUi
