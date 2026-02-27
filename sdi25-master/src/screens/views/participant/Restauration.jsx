@@ -100,6 +100,8 @@ export default function Restauration() {
   };
 
   const handleCommand = async () => {
+    const rawUser = secureLocalStorage.getItem("user");
+    const decodedUser = rawUser?.etudiant ?? rawUser ?? {};
     const participantName = resolveParticipantName();
     const teamName = resolveTeamName();
     const selectedRoomValue = resolveRoomValue();
@@ -128,6 +130,29 @@ export default function Restauration() {
       equipe: teamName.trim(),
       salle,
     };
+
+    const participantId =
+      decodedUser?.id ??
+      decodedUser?.etudiantId ??
+      decodedUser?.participantId ??
+      null;
+    const matricule = decodedUser?.matricule ?? null;
+    const prenom = decodedUser?.prenom ?? null;
+
+    if (participantId) {
+      payload.participantId = participantId;
+      payload.participant_id = participantId;
+      payload.etudiantId = participantId;
+      payload.userId = participantId;
+      payload.user_id = participantId;
+    }
+    if (matricule) {
+      payload.matricule = matricule;
+      payload.participantMatricule = matricule;
+    }
+    if (prenom) {
+      payload.prenom = prenom;
+    }
     if (repasId) {
       payload.repasId = repasId;
       payload.repas_id = repasId;
@@ -207,7 +232,52 @@ export default function Restauration() {
       }
     }
 
-    if (result.commande || result.collation || result.repasCommande) {
+    const rawUser = secureLocalStorage.getItem("user");
+    const decodedUser = rawUser?.etudiant ?? rawUser ?? {};
+    const connectedUserId = decodedUser?.id ?? decodedUser?.etudiantId ?? null;
+    const connectedMatricule = decodedUser?.matricule ?? null;
+
+    const rawOrders = Array.isArray(result?.commandes)
+      ? result.commandes
+      : Array.isArray(result?.orders)
+        ? result.orders
+        : [];
+
+    if (rawOrders.length > 0) {
+      const connectedOrder = rawOrders.find((item) => {
+        const participant = item?.participant ?? item?.etudiant ?? item?.user ?? {};
+        const participantId =
+          participant?.id ??
+          item?.participantId ??
+          item?.participant_id ??
+          item?.etudiantId ??
+          item?.userId ??
+          null;
+        const participantMatricule =
+          participant?.matricule ??
+          item?.matricule ??
+          item?.participantMatricule ??
+          null;
+
+        if (connectedUserId && participantId) {
+          return String(connectedUserId) === String(participantId);
+        }
+        if (connectedMatricule && participantMatricule) {
+          return String(connectedMatricule) === String(participantMatricule);
+        }
+        return false;
+      });
+
+      if (connectedOrder) {
+        setOrder({
+          commande: connectedOrder,
+          collation: connectedOrder?.collation,
+          repas: connectedOrder?.repas ?? connectedOrder?.repasCommande,
+        });
+      } else {
+        setOrder({});
+      }
+    } else if (result.commande || result.collation || result.repasCommande) {
       setOrder({
         commande: result.commande,
         collation: result.collation,
@@ -292,7 +362,7 @@ export default function Restauration() {
               ) : null}
             </div>
           </div>
-          {data.hasOrdered ? (
+          {order?.commande || order?.repas || order?.collation ? (
             <div className="text-sm text-gray-600">
               Derniere commande: {getOrderLabel(order)}
             </div>
