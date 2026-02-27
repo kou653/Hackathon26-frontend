@@ -13,12 +13,14 @@ import {
   handleServiceResetcommand,
   handleServiceScanCode,
 } from "../../services/restaurantService.tsx";
+import { handleServiceGetClassList } from "../../services/ConstantsService.tsx";
 
 export default function RestaurantView() {
   const [value, setValue] = React.useState(0);
   const [commandList, setCommandList] = useState([]);
   const [allrepas, setAllRepas] = useState([]);
   const [roomsList, setRoomsList] = useState([]);
+  const [classList, setClassList] = useState([]);
   const [nbEaters, setNbEaters] = useState(0);
 
   async function handleGetCommandList(showLoader = true) {
@@ -41,6 +43,18 @@ export default function RestaurantView() {
     setRoomsList(Array.isArray(result) ? result : []);
   }
 
+  async function handleGetClasses() {
+    const result = await handleServiceGetClassList();
+    const normalizedClasses = Array.isArray(result)
+      ? result
+      : Array.isArray(result?.classes)
+        ? result.classes
+        : Array.isArray(result?.data)
+          ? result.data
+          : [];
+    setClassList(normalizedClasses);
+  }
+
   const handleResetCommandList = async () => {
     setIsLoading(true);
     const result = await handleServiceResetcommand();
@@ -59,6 +73,7 @@ export default function RestaurantView() {
         await handleGetCommandList();
         await handleGetAllRepas();
         await handleGetRooms();
+        await handleGetClasses();
       }
       setIsLoading(false);
     };
@@ -121,7 +136,18 @@ export default function RestaurantView() {
 
     const nom = participant.nom ?? "";
     const prenom = participant.prenom ?? "";
-    const fullName = `${nom} ${prenom}`.trim();
+    const nomNormalized = String(nom).trim();
+    const prenomNormalized = String(prenom).trim();
+    const nomLower = nomNormalized.toLowerCase();
+    const prenomLower = prenomNormalized.toLowerCase();
+    const shouldAvoidDuplicatePrenom =
+      nomNormalized &&
+      prenomNormalized &&
+      (nomLower === prenomLower || nomLower.endsWith(` ${prenomLower}`));
+
+    const fullName = shouldAvoidDuplicatePrenom
+      ? nomNormalized
+      : `${nomNormalized} ${prenomNormalized}`.trim();
     return fullName || participant.matricule || "Participant non defini";
   }
 
@@ -206,6 +232,10 @@ export default function RestaurantView() {
       const matchedRoom = roomsList.find((oneRoom) => String(oneRoom?.id) === String(normalizedId));
       if (matchedRoom?.libelle) return matchedRoom.libelle;
       if (matchedRoom?.nom) return matchedRoom.nom;
+
+      const matchedClass = classList.find((oneClass) => String(oneClass?.id) === String(normalizedId));
+      if (matchedClass?.libelle) return matchedClass.libelle;
+      if (matchedClass?.nom) return matchedClass.nom;
     }
 
     return "Salle non definie";
