@@ -12,6 +12,10 @@ export default function Restauration() {
   const [order, setOrder] = useState({});
   const [data, setData] = useState({});
 
+  const [participantName, setParticipantName] = useState("");
+  const [teamName, setTeamName] = useState("");
+  const [roomValue, setRoomValue] = useState("");
+
   const [listRepas, setListRepas] = useState([]);
   const [repasValue, setRepasValue] = useState("");
   const handleRepasChange = (selectedOption) => {
@@ -22,6 +26,11 @@ export default function Restauration() {
   const [collationValue, setCollationValue] = useState("");
   const handleCollationChange = (selectedOption) => {
     setCollationValue(selectedOption?.value ?? "");
+  };
+
+  const [listSalles, setListSalles] = useState([]);
+  const handleSalleChange = (selectedOption) => {
+    setRoomValue(selectedOption?.value ?? "");
   };
 
   const getOrderLabel = (payload) => {
@@ -37,6 +46,11 @@ export default function Restauration() {
   };
 
   const handleCommand = async () => {
+    if (!participantName.trim() || !teamName.trim() || !String(roomValue).trim()) {
+      notify("error", "Renseignez nom, equipe et salle");
+      return;
+    }
+
     if (!repasValue && !collationValue) {
       notify("error", "Choisissez au moins un repas ou une collation");
       return;
@@ -46,13 +60,14 @@ export default function Restauration() {
     const repasId = repasValue ? Number(repasValue) : null;
     const collationId = collationValue ? Number(collationValue) : null;
 
-    // Compatibilite API: certains backends attendent camelCase, d'autres snake_case.
+    const salle = String(roomValue).trim();
+
     const payload = {
+      nom: participantName.trim(),
+      equipe: teamName.trim(),
+      salle,
       repasId,
       collationId,
-      repas_id: repasId,
-      collation_id: collationId,
-      qrcodeValue: data?.qrcodeValue ?? null,
     };
 
     const ok = await handleServiceCommand(payload);
@@ -91,6 +106,16 @@ export default function Restauration() {
       setListCollation([]);
     }
 
+    if (Array.isArray(result.salles)) {
+      const tempSalles = result.salles.map((item) => ({
+        value: item.id ?? item.libelle,
+        label: item.libelle ?? String(item.id),
+      }));
+      setListSalles(tempSalles);
+    } else {
+      setListSalles([]);
+    }
+
     if (result.commande || result.collation || result.repasCommande) {
       setOrder({
         commande: result.commande,
@@ -117,10 +142,43 @@ export default function Restauration() {
             Commandez votre restauration
           </h1>
           {!data.hasOrdered ? (
-            <div className="w-full">
-              <center>
+            <div className="w-full max-w-xl">
+              <div className="flex flex-col gap-4">
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                  placeholder="Votre nom complet"
+                  value={participantName}
+                  onChange={(event) => setParticipantName(event.target.value)}
+                />
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                  placeholder="Nom de votre equipe"
+                  value={teamName}
+                  onChange={(event) => setTeamName(event.target.value)}
+                />
+                {listSalles.length > 0 ? (
+                  <div className="w-full">
+                    <SelectUi
+                      placeholder="Choisissez votre salle"
+                      options={listSalles}
+                      filterValue={roomValue}
+                      onChange={handleSalleChange}
+                    />
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                    placeholder="Salle"
+                    value={roomValue}
+                    onChange={(event) => setRoomValue(event.target.value)}
+                  />
+                )}
+
                 {listRepas.length !== 0 ? (
-                  <div className="mb-4 w-full">
+                  <div className="w-full">
                     <SelectUi
                       placeholder="Choisissez un repas"
                       options={listRepas}
@@ -130,15 +188,17 @@ export default function Restauration() {
                   </div>
                 ) : null}
                 {listCollation.length !== 0 ? (
-                  <SelectUi
-                    placeholder="Choisissez une collation"
-                    options={listCollation}
-                    filterValue={collationValue}
-                    onChange={handleCollationChange}
-                  />
+                  <div className="w-full">
+                    <SelectUi
+                      placeholder="Choisissez une collation"
+                      options={listCollation}
+                      filterValue={collationValue}
+                      onChange={handleCollationChange}
+                    />
+                  </div>
                 ) : null}
                 {listCollation.length !== 0 || listRepas.length !== 0 ? (
-                  <div className="mt-6">
+                  <div className="mt-2">
                     <Button
                       label="Commander"
                       onClick={() => handleCommand()}
@@ -148,7 +208,7 @@ export default function Restauration() {
                     />
                   </div>
                 ) : null}
-              </center>
+              </div>
             </div>
           ) : (
             <div>Vous avez commande: {getOrderLabel(order)}</div>

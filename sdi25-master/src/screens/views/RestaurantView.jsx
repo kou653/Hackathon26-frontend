@@ -19,11 +19,11 @@ export default function RestaurantView() {
   const [allrepas, setAllRepas] = useState([]);
   const [nbEaters, setNbEaters] = useState(0);
 
-  async function handleGetCommandList() {
-    setIsLoading(true);
+  async function handleGetCommandList(showLoader = true) {
+    if (showLoader) setIsLoading(true);
     const result = await handleServiceGetcommand();
     setCommandList(Array.isArray(result) ? result : []);
-    setIsLoading(false);
+    if (showLoader) setIsLoading(false);
   }
 
   async function handleGetAllRepas() {
@@ -62,6 +62,14 @@ export default function RestaurantView() {
     };
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleGetCommandList(false);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
@@ -93,7 +101,15 @@ export default function RestaurantView() {
 
   function getParticipantLabel(item) {
     const participant = item?.participant ?? item?.etudiant ?? item?.user;
-    if (!participant) return "Participant non defini";
+    if (!participant) {
+      return (
+        item?.participant_nom ??
+        item?.nomParticipant ??
+        item?.participantName ??
+        item?.nom ??
+        "Participant non defini"
+      );
+    }
 
     const nom = participant.nom ?? "";
     const prenom = participant.prenom ?? "";
@@ -103,13 +119,29 @@ export default function RestaurantView() {
 
   function getTeamLabel(item) {
     const team = item?.equipe ?? item?.team ?? item?.participant?.equipe;
-    if (!team) return "Equipe non definie";
+    if (!team) {
+      return (
+        item?.equipe_nom ??
+        item?.nomEquipe ??
+        item?.teamName ??
+        item?.equipe ??
+        "Equipe non definie"
+      );
+    }
     return team.nom ?? team.libelle ?? "Equipe non definie";
   }
 
   function getRoomLabel(item) {
     const room = item?.salle ?? item?.room ?? item?.participant?.salle;
-    if (!room) return "Salle non definie";
+    if (!room) {
+      return (
+        item?.salle_nom ??
+        item?.nomSalle ??
+        item?.roomName ??
+        item?.salle ??
+        "Salle non definie"
+      );
+    }
     return room.libelle ?? room.nom ?? "Salle non definie";
   }
 

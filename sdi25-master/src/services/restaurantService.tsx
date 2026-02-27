@@ -96,7 +96,12 @@ export const handleServiceGetcommand = async () => {
 
     switch (status) {
     case true:
-      return response.data.data.commandes;
+      return (
+        response.data?.data?.commandes ??
+        response.data?.data?.orders ??
+        response.data?.data ??
+        []
+      );
     case false:
       return [];
     }
