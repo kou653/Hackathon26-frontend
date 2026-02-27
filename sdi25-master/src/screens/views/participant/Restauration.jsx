@@ -75,6 +75,8 @@ export default function Restauration() {
 
     const ok = await handleServiceCommand(payload);
     if (ok) {
+      setRepasValue("");
+      setCollationValue("");
       await getData();
     }
     setIsLoading(false);
@@ -144,78 +146,79 @@ export default function Restauration() {
           <h1 className="font-bold text-xl text-center my-6 text-[#F94C10]">
             Commandez votre restauration
           </h1>
-          {!data.hasOrdered ? (
-            <div className="w-full max-w-xl">
-              <div className="flex flex-col gap-4">
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                  placeholder="Votre nom complet"
-                  value={participantName}
-                  onChange={(event) => setParticipantName(event.target.value)}
-                />
-                <input
-                  type="text"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                  placeholder="Nom de votre equipe"
-                  value={teamName}
-                  onChange={(event) => setTeamName(event.target.value)}
-                />
-                {listSalles.length > 0 ? (
-                  <div className="w-full">
-                    <SelectUi
-                      placeholder="Choisissez votre salle"
-                      options={listSalles}
-                      filterValue={roomValue}
-                      onChange={handleSalleChange}
-                    />
-                  </div>
-                ) : (
-                  <input
-                    type="text"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                    placeholder="Salle"
-                    value={roomValue}
-                    onChange={(event) => setRoomValue(event.target.value)}
+          <div className="w-full max-w-xl">
+            <div className="flex flex-col gap-4">
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                placeholder="Votre nom complet"
+                value={participantName}
+                onChange={(event) => setParticipantName(event.target.value)}
+              />
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                placeholder="Nom de votre equipe"
+                value={teamName}
+                onChange={(event) => setTeamName(event.target.value)}
+              />
+              {listSalles.length > 0 ? (
+                <div className="w-full">
+                  <SelectUi
+                    placeholder="Choisissez votre salle"
+                    options={listSalles}
+                    filterValue={roomValue}
+                    onChange={handleSalleChange}
                   />
-                )}
+                </div>
+              ) : (
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3"
+                  placeholder="Salle"
+                  value={roomValue}
+                  onChange={(event) => setRoomValue(event.target.value)}
+                />
+              )}
 
-                {listRepas.length !== 0 ? (
-                  <div className="w-full">
-                    <SelectUi
-                      placeholder="Choisissez un repas"
-                      options={listRepas}
-                      filterValue={repasValue}
-                      onChange={handleRepasChange}
-                    />
-                  </div>
-                ) : null}
-                {listCollation.length !== 0 ? (
-                  <div className="w-full">
-                    <SelectUi
-                      placeholder="Choisissez une collation"
-                      options={listCollation}
-                      filterValue={collationValue}
-                      onChange={handleCollationChange}
-                    />
-                  </div>
-                ) : null}
-                {listCollation.length !== 0 || listRepas.length !== 0 ? (
-                  <div className="mt-2">
-                    <Button
-                      label="Commander"
-                      onClick={() => handleCommand()}
-                      isDisable={false}
-                      isLoading={isLoading}
-                      isReady={true}
-                    />
-                  </div>
-                ) : null}
-              </div>
+              {listRepas.length !== 0 ? (
+                <div className="w-full">
+                  <SelectUi
+                    placeholder="Choisissez un repas"
+                    options={listRepas}
+                    filterValue={repasValue}
+                    onChange={handleRepasChange}
+                  />
+                </div>
+              ) : null}
+              {listCollation.length !== 0 ? (
+                <div className="w-full">
+                  <SelectUi
+                    placeholder="Choisissez une collation"
+                    options={listCollation}
+                    filterValue={collationValue}
+                    onChange={handleCollationChange}
+                  />
+                </div>
+              ) : null}
+              {listCollation.length !== 0 || listRepas.length !== 0 ? (
+                <div className="mt-2">
+                  <Button
+                    label="Commander"
+                    onClick={() => handleCommand()}
+                    isDisable={false}
+                    isLoading={isLoading}
+                    isReady={true}
+                  />
+                </div>
+              ) : null}
             </div>
-          ) : (
-            <div>Vous avez commande: {getOrderLabel(order)}</div>
-          )}
+          </div>
+          {data.hasOrdered ? (
+            <div className="text-sm text-gray-600">
+              Derniere commande: {getOrderLabel(order)}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>
