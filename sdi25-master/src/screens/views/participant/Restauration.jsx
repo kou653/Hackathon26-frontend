@@ -45,26 +45,77 @@ export default function Restauration() {
     return "commande enregistree";
   };
 
-  const handleCommand = async () => {
-    const decodedUser = secureLocalStorage.getItem("user")?.etudiant;
-    const decodedTeam = secureLocalStorage.getItem("team");
+  const resolveParticipantName = () => {
+    const rawUser = secureLocalStorage.getItem("user");
+    const decodedUser = rawUser?.etudiant ?? rawUser ?? {};
+    const participantFromData = data?.participant ?? data?.etudiant ?? data?.user ?? {};
 
-    const participantName = `${decodedUser?.nom ?? ""} ${decodedUser?.prenom ?? ""}`.trim();
-    const teamName =
+    const nom = decodedUser?.nom ?? participantFromData?.nom ?? "";
+    const prenom = decodedUser?.prenom ?? participantFromData?.prenom ?? "";
+    const fullName = `${nom} ${prenom}`.trim();
+
+    return (
+      fullName ||
+      participantFromData?.matricule ||
+      decodedUser?.matricule ||
+      "Participant"
+    );
+  };
+
+  const resolveTeamName = () => {
+    const decodedTeam = secureLocalStorage.getItem("team");
+    const rawUser = secureLocalStorage.getItem("user");
+    const decodedUser = rawUser?.etudiant ?? rawUser ?? {};
+    const participantFromData = data?.participant ?? data?.etudiant ?? data?.user ?? {};
+
+    return (
       decodedTeam?.find?.((element) => element?.chef === 1)?.groupe?.nom ??
       decodedTeam?.find?.((element) => element?.equipe?.nom)?.equipe?.nom ??
       decodedTeam?.[0]?.groupe?.nom ??
       decodedTeam?.[0]?.equipe?.nom ??
       decodedUser?.groupe?.nom ??
       decodedUser?.equipe?.nom ??
+      participantFromData?.groupe?.nom ??
+      participantFromData?.equipe?.nom ??
       data?.equipe?.nom ??
       data?.team?.nom ??
       (typeof data?.equipe === "string" ? data.equipe : "") ??
       (typeof data?.team === "string" ? data.team : "") ??
-      "";
+      "Equipe non definie"
+    );
+  };
 
-    if (!participantName || !teamName || !String(roomValue).trim()) {
-      notify("error", "Impossible de retrouver nom, equipe ou salle");
+  const resolveRoomValue = () => {
+    if (String(roomValue ?? "").trim()) return roomValue;
+
+    const roomFromData =
+      data?.salle?.id ??
+      data?.room?.id ??
+      data?.participant?.salle?.id ??
+      data?.participant?.room?.id ??
+      data?.salle?.libelle ??
+      data?.room?.libelle ??
+      data?.participant?.salle?.libelle ??
+      data?.participant?.room?.libelle ??
+      data?.salle ??
+      data?.room;
+
+    if (String(roomFromData ?? "").trim()) return roomFromData;
+
+    if (Array.isArray(listSalles) && listSalles.length === 1) {
+      return listSalles[0]?.value ?? "";
+    }
+
+    return "";
+  };
+
+  const handleCommand = async () => {
+    const participantName = resolveParticipantName();
+    const teamName = resolveTeamName();
+    const selectedRoomValue = resolveRoomValue();
+
+    if (!String(selectedRoomValue ?? "").trim()) {
+      notify("error", "Veuillez choisir votre salle");
       return;
     }
 
@@ -78,9 +129,9 @@ export default function Restauration() {
     const collationId = collationValue ? Number(collationValue) : null;
 
     const salle =
-      typeof roomValue === "number" || /^\d+$/.test(String(roomValue))
-        ? Number(roomValue)
-        : String(roomValue).trim();
+      typeof selectedRoomValue === "number" || /^\d+$/.test(String(selectedRoomValue))
+        ? Number(selectedRoomValue)
+        : String(selectedRoomValue).trim();
 
     const payload = {
       nom: participantName.trim(),
@@ -183,6 +234,12 @@ export default function Restauration() {
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    if (!String(roomValue ?? "").trim() && Array.isArray(listSalles) && listSalles.length === 1) {
+      setRoomValue(listSalles[0]?.value ?? "");
+    }
+  }, [listSalles, roomValue]);
 
   return (
     <div className="max-w-xl mx-auto md:py-24 py-4 px-4">
