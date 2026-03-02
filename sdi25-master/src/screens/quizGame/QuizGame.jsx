@@ -20,3 +20,5 @@ export default function QuizGame() {
 
   return <div className="h-full">{display ? <Log renderDisplay={renderDisplay} /> : <Quiz />}</div>;
 }
+
+//test micro

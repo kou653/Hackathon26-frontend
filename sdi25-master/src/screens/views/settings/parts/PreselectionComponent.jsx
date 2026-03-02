@@ -5,9 +5,11 @@ import {
   handleServiceDeleteAnswer,
   handleServiceDeleteQuestion,
   handleServiceGetCurrentQuiz,
+  handleServiceOpenSessionQuizTeam,
   handleServiceUpdateQuestion,
 } from "../../../../services/PreselectionService.tsx";
 import { handleServiceGetLevelsList } from "../../../../services/ConstantsService.tsx";
+import { handleServiceGetTeams } from "../../../../services/teamsService.tsx";
 import InputField from "../../../../components/ui/InputField.tsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import SelectUi from "../../../../components/ui/SelectUi.tsx";
@@ -451,6 +453,70 @@ export default function PreselectionComponent() {
     handleGetCurrentQuiz();
   };
 
+  const handleActivateSeriesForLevel = async () => {
+    if (!ensureLevelSelected()) return;
+
+    const confirm = await Swal.fire({
+      title: "Activer une nouvelle serie ?",
+      text: "Cela re-initialise la session quiz des equipes du niveau pour jouer la prochaine serie maintenant.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#265073",
+      cancelButtonColor: "#C7C8CC",
+      confirmButtonText: "Activer",
+      cancelButtonText: "Annuler",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    setIsLoading(true);
+
+    const [teamsNotQualified, teamsQualified] = await Promise.all([
+      handleServiceGetTeams({ niveauId: levelValue, statut: 0 }),
+      handleServiceGetTeams({ niveauId: levelValue, statut: 1 }),
+    ]);
+
+    const teamMap = new Map();
+    [...teamsNotQualified, ...teamsQualified].forEach((team) => {
+      if (team?.id) {
+        teamMap.set(team.id, team);
+      }
+    });
+
+    const teams = Array.from(teamMap.values());
+
+    if (teams.length === 0) {
+      setIsLoading(false);
+      Swal.fire({
+        title: "Aucune equipe",
+        text: "Aucune equipe trouvee pour ce niveau.",
+        icon: "info",
+      });
+      return;
+    }
+
+    let successCount = 0;
+    let failedCount = 0;
+
+    for (const team of teams) {
+      const ok = await handleServiceOpenSessionQuizTeam({ equipeId: team.id });
+      if (ok) {
+        successCount += 1;
+      } else {
+        failedCount += 1;
+      }
+    }
+
+    await handleGetCurrentQuiz();
+    setIsLoading(false);
+
+    Swal.fire({
+      title: "Serie activee",
+      html: `${successCount} equipe(s) re-initialisee(s).<br/>${failedCount} echec(s).`,
+      icon: failedCount > 0 ? "warning" : "success",
+    });
+  };
+
   useEffect(() => {
     setIsLoading(true);
     handleServiceGetLevelsList({ esatic: 1 }).then((result) => {
@@ -492,6 +558,13 @@ export default function PreselectionComponent() {
                     onClick={() => handleChangeQuizStatus()}
                     type="submit"
                     label={quizState === 0 ? "Ouvrir le quiz" : "Fermer le quiz"}
+                    isReady={true}
+                    isLoading={false}
+                  />
+                  <Button
+                    onClick={() => handleActivateSeriesForLevel()}
+                    type="button"
+                    label="Activer une nouvelle serie"
                     isReady={true}
                     isLoading={false}
                   />
@@ -698,3 +771,4 @@ export default function PreselectionComponent() {
     </div>
   );
 }
+
