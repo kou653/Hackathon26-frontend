@@ -62,11 +62,11 @@ export default function AuthView() {
             promouvoir les TIC.
           </p>
           <div className="flex justify-center gap-4 mt-11">
-            <LinkButton
+            {/* <LinkButton
               label="Connexion"
               type="button"
               route="/hackathon/auth/LogInView"
-            />
+            /> */}
             {/* <LinkButton
               label="Inscription"
               type="button"
