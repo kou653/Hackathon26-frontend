@@ -35,12 +35,6 @@ export default function PreselectionComponent() {
     setLevelValue(selectedOption.value);
   };
 
-  // variables for question score ----->
-  // const [scoreValue, setScoreValue] = useState(0);
-  // const handleChangeScoreValue = (event) => {
-  //   setScoreValue(event.target.value);
-  // };
-
   // variables for question answer ----->
   const [answersValue, setAnswersValue] = useState([]);
   const handleChangeAnswersValue = (event, index) => {
@@ -63,6 +57,10 @@ export default function PreselectionComponent() {
     setQuestionValue(event.target.value);
   };
 
+  // variables for bulk import ----->
+  const [bulkQuestionsValue, setBulkQuestionsValue] = useState("");
+  const [replaceExistingQuestions, setReplaceExistingQuestions] = useState(true);
+
   // function to get current quiz for a specific level
   const [quizState, setQuizState] = useState(null);
   const [score, setScore] = useState(0);
@@ -79,18 +77,215 @@ export default function PreselectionComponent() {
     });
   };
 
+  const ensureLevelSelected = () => {
+    if (!levelValue || Number(levelValue) === 0) {
+      Swal.fire({
+        title: "Niveau requis",
+        text: "Choisissez un niveau avant de continuer.",
+        icon: "warning",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const parseBulkQuestions = (rawInput) => {
+    const lines = rawInput
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    const parsed = [];
+
+    lines.forEach((line, index) => {
+      const parts = line
+        .split(";")
+        .map((part) => part.trim())
+        .filter(Boolean);
+
+      if (parts.length < 3) {
+        throw new Error(
+          `Ligne ${index + 1} invalide. Format attendu: Question ; Reponse 1* ; Reponse 2 ; Reponse 3`
+        );
+      }
+
+      const question = parts[0];
+      const answers = parts.slice(1).map((answer) => {
+        const isCorrect = answer.includes("*");
+        return {
+          content: answer.replace(/\*/g, "").trim(),
+          score: isCorrect ? 1 : 0,
+        };
+      });
+
+      if (!answers.some((answer) => answer.score > 0)) {
+        answers[0].score = 1;
+      }
+
+      parsed.push({ question, answers });
+    });
+
+    return parsed;
+  };
+
+  const handleDeleteAllQuestions = async () => {
+    if (!ensureLevelSelected()) return;
+
+    const confirm = await Swal.fire({
+      title: "Supprimer toutes les questions ?",
+      text: "Cette action supprimera toutes les questions et leurs reponses du niveau selectionne.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#265073",
+      cancelButtonColor: "#C7C8CC",
+      confirmButtonText: "Oui, supprimer",
+      cancelButtonText: "Annuler",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    setIsLoading(true);
+    const current = await handleServiceGetCurrentQuiz({ niveauId: levelValue });
+    const list = current?.questions || [];
+
+    for (const question of list) {
+      await handleServiceDeleteQuestion({ questionId: question.id });
+    }
+
+    await handleGetCurrentQuiz();
+    setIsLoading(false);
+
+    Swal.fire({
+      title: "Termine",
+      text: `${list.length} question(s) supprimee(s).`,
+      icon: "success",
+    });
+  };
+
+  const handleBulkImportQuestions = async () => {
+    if (!ensureLevelSelected()) return;
+
+    let parsed;
+    try {
+      parsed = parseBulkQuestions(bulkQuestionsValue);
+    } catch (error) {
+      Swal.fire({
+        title: "Import invalide",
+        text: error.message,
+        icon: "error",
+      });
+      return;
+    }
+
+    if (parsed.length === 0) {
+      Swal.fire({
+        title: "Aucune question",
+        text: "Collez au moins une ligne avant d'importer.",
+        icon: "warning",
+      });
+      return;
+    }
+
+    const confirm = await Swal.fire({
+      title: "Importer les questions ?",
+      html: `Vous allez importer <b>${parsed.length}</b> question(s).`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#265073",
+      cancelButtonColor: "#C7C8CC",
+      confirmButtonText: "Importer",
+      cancelButtonText: "Annuler",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    setIsLoading(true);
+
+    let knownIds = new Set(quizList.map((item) => item.id));
+
+    if (replaceExistingQuestions) {
+      for (const existing of quizList) {
+        await handleServiceDeleteQuestion({ questionId: existing.id });
+      }
+      knownIds = new Set();
+    }
+
+    let importedCount = 0;
+    const errors = [];
+
+    for (const item of parsed) {
+      const created = await handleServiceCreateQuestion({
+        niveauId: levelValue,
+        question: item.question,
+      });
+
+      if (!created) {
+        errors.push(`Question non creee: ${item.question}`);
+        continue;
+      }
+
+      const refreshed = await handleServiceGetCurrentQuiz({ niveauId: levelValue });
+      const refreshedQuestions = refreshed?.questions || [];
+
+      const newQuestion =
+        refreshedQuestions.find(
+          (question) =>
+            !knownIds.has(question.id) &&
+            question.content?.trim() === item.question.trim()
+        ) || refreshedQuestions.find((question) => !knownIds.has(question.id));
+
+      if (!newQuestion) {
+        errors.push(`Question introuvable apres creation: ${item.question}`);
+        continue;
+      }
+
+      knownIds.add(newQuestion.id);
+
+      for (const answer of item.answers) {
+        await handleServiceCreateAnswer({
+          niveauId: levelValue,
+          questionId: newQuestion.id,
+          response: answer.content,
+          score: answer.score,
+        });
+      }
+
+      importedCount += 1;
+    }
+
+    setBulkQuestionsValue("");
+    await handleGetCurrentQuiz();
+    setIsLoading(false);
+
+    if (errors.length > 0) {
+      Swal.fire({
+        title: "Import partiel",
+        html: `${importedCount} question(s) importee(s).<br/>${errors.length} erreur(s).`,
+        icon: "warning",
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: "Import termine",
+      text: `${importedCount} question(s) importee(s) avec succes.`,
+      icon: "success",
+    });
+  };
+
   // function to add a question for the quiz of a specific level
   const handleCreateQuizQuestion = async () => {
+    if (!ensureLevelSelected()) return;
+
     setIsLoading(true);
     const data = {
       niveauId: levelValue,
       question: questionValue,
     };
     await handleServiceCreateQuestion(data);
+    setQuestionValue("");
+    await handleGetCurrentQuiz();
     setIsLoading(false);
-
-    setLevelValue("");
-    handleGetCurrentQuiz();
   };
 
   // function to add a question for the quiz of a specific level
@@ -115,16 +310,15 @@ export default function PreselectionComponent() {
     setAnswersValue(newAnswers);
     setAnswersScoreValue(newScores);
 
-    handleGetCurrentQuiz();
+    await handleGetCurrentQuiz();
     setIsLoading(false);
   };
-
 
   // fonction to delete an answer
   const handleDeleteAnswer = (id) => {
     Swal.fire({
       title: "Supprimer",
-      text: "Êtes-vous sûr de supprimer cette réponse ?",
+      text: "Etes-vous sur de supprimer cette reponse ?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#265073",
@@ -140,24 +334,24 @@ export default function PreselectionComponent() {
         await handleServiceDeleteAnswer(data);
         if (data) {
           Swal.fire({
-            title: "Supprimé !",
-            text: "Réponse supprimée avec succès",
+            title: "Supprime !",
+            text: "Reponse supprimee avec succes",
             icon: "success",
           });
         }
 
-        handleGetCurrentQuiz();
+        await handleGetCurrentQuiz();
         setIsLoading(false);
       }
     });
   };
 
-  // fonction to delete an answer
+  // fonction to delete a question
   const handleDeleteQuestion = () => {
     handleClose();
     Swal.fire({
       title: "Supprimer",
-      text: "Êtes-vous sûr de vouloir supprimer cette question ?",
+      text: "Etes-vous sur de vouloir supprimer cette question ?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#265073",
@@ -173,13 +367,13 @@ export default function PreselectionComponent() {
         await handleServiceDeleteQuestion(data);
         if (data) {
           Swal.fire({
-            title: "Supprimé !",
-            text: "Question supprimée avec succès",
+            title: "Supprime !",
+            text: "Question supprimee avec succes",
             icon: "success",
           });
         }
 
-        handleGetCurrentQuiz();
+        await handleGetCurrentQuiz();
         setIsLoading(false);
       }
     });
@@ -188,13 +382,13 @@ export default function PreselectionComponent() {
   const handleUpdateQuestion = () => {
     handleClose();
     Swal.fire({
-      title: "Mise à jour",
-      text: "Êtes-vous sûr de vouloir mettre à jour cette question ?",
+      title: "Mise a jour",
+      text: "Etes-vous sur de vouloir mettre a jour cette question ?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#265073",
       cancelButtonColor: "#C7C8CC",
-      confirmButtonText: "Mettre à jour",
+      confirmButtonText: "Mettre a jour",
       cancelButtonText: "Annuler",
     }).then(async (result) => {
       if (result.isConfirmed) {
@@ -206,13 +400,13 @@ export default function PreselectionComponent() {
         await handleServiceUpdateQuestion(data);
         if (data) {
           Swal.fire({
-            title: "Mise à jour !",
-            text: "Question mise à jour avec succès",
+            title: "Mise a jour !",
+            text: "Question mise a jour avec succes",
             icon: "success",
           });
         }
 
-        handleGetCurrentQuiz();
+        await handleGetCurrentQuiz();
         setIsLoading(false);
       }
     });
@@ -290,14 +484,14 @@ export default function PreselectionComponent() {
                   <Button
                     onClick={() => handleGetCurrentQuiz()}
                     type="button"
-                    label="Récupérer le quiz"
+                    label="Recuperer le quiz"
                     isReady={true}
                     isLoading={false}
                   />
                   <Button
                     onClick={() => handleChangeQuizStatus()}
                     type="submit"
-                    label= { quizState === 0 ? "Ouvrir le quiz" : "Fermer le quiz" }
+                    label={quizState === 0 ? "Ouvrir le quiz" : "Fermer le quiz"}
                     isReady={true}
                     isLoading={false}
                   />
@@ -319,6 +513,44 @@ export default function PreselectionComponent() {
                   isReady={true}
                   isLoading={false}
                 />
+
+                <div className="mt-8 p-4 border rounded-md border-gray-200">
+                  <p className="font-bold text-sm">Import en lot</p>
+                  <p className="text-xs text-gray-600 mt-2">
+                    Format par ligne: Question ; Reponse correcte* ; Reponse 2 ; Reponse 3
+                  </p>
+                  <textarea
+                    className="w-full mt-3 p-3 border rounded-md text-sm"
+                    rows={7}
+                    placeholder={"Exemple:\nQuelle est la capitale de la France ? ; Paris* ; Lyon ; Marseille"}
+                    value={bulkQuestionsValue}
+                    onChange={(event) => setBulkQuestionsValue(event.target.value)}
+                  />
+                  <label className="flex items-center gap-2 text-sm mt-3">
+                    <input
+                      type="checkbox"
+                      checked={replaceExistingQuestions}
+                      onChange={(event) => setReplaceExistingQuestions(event.target.checked)}
+                    />
+                    Remplacer les questions existantes
+                  </label>
+                  <div className="mt-4 flex flex-col gap-2">
+                    <Button
+                      onClick={() => handleBulkImportQuestions()}
+                      type="button"
+                      label="Importer en lot"
+                      isReady={true}
+                      isLoading={false}
+                    />
+                    <Button
+                      onClick={() => handleDeleteAllQuestions()}
+                      type="button"
+                      label="Supprimer toutes les questions"
+                      isReady={true}
+                      isLoading={false}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <section className="max-w-xl lg:w-3/5 lg:mt-0 mt-9 w-full overflow-auto h-[600px] p-4">
@@ -331,12 +563,12 @@ export default function PreselectionComponent() {
                         Question {index + 1} : {item.content}
                         <span
                           onClick={(e) => {
-                            e.stopPropagation();   // empêche l'ouverture de l'accordéon
+                            e.stopPropagation();
                             handleOpen(item);
                           }}
                           className="ml-4 text-blue-500 cursor-pointer inline-flex items-center"
                         >
-                          éditer
+                          editer
                           <FontAwesomeIcon
                             className="text-blue-500 text-lg ml-2"
                             icon={faPen}
@@ -402,9 +634,9 @@ export default function PreselectionComponent() {
                                   el.score > 0
                                     ? "text-green-500"
                                     : "text-gray-600"
-                                } text-[15px] mb-6}`}
+                                } text-[15px] mb-6`}
                               >
-                                Réponse {ind + 1} : {el.content} --- {el.score}{" "}
+                                Reponse {ind + 1} : {el.content} --- {el.score}{" "}
                                 pts
                               </p>
                               <button onClick={() => handleDeleteAnswer(el.id)}>
@@ -418,14 +650,14 @@ export default function PreselectionComponent() {
                         </div>
                         <div className="flex flex-col gap-4">
                           <p className="font-bold text-[15px] mt-6 text-gray-600">
-                            Ajouter une réponse
+                            Ajouter une reponse
                           </p>
                           <InputField
                             onClick={() => {
                               return;
                             }}
                             type="text"
-                            placeholder="réponse..."
+                            placeholder="reponse..."
                             value={answersValue[index]}
                             onChange={(event) =>
                               handleChangeAnswersValue(event, index)
@@ -445,7 +677,7 @@ export default function PreselectionComponent() {
                           <Button
                             onClick={() => handleCreateAnswer(item.id, index)}
                             type="button"
-                            label="Ajouter la réponse"
+                            label="Ajouter la reponse"
                             isReady={true}
                             isLoading={false}
                           />
@@ -454,7 +686,7 @@ export default function PreselectionComponent() {
                     </Accordion.Panel>
                   </Accordion>
                 </div>
-              )) :(<h3 className="mt-9 text-lg">Aucunes questions </h3>)}
+              )) : (<h3 className="mt-9 text-lg">Aucunes questions </h3>)}
             </section>
           </div>
         </div>
