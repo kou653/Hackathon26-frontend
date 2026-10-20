@@ -1,6 +1,4 @@
 import { handleServiceGetQuizState } from "../../../services/quizService.tsx";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCode } from "@fortawesome/free-solid-svg-icons";
 import secureLocalStorage from "react-secure-storage";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";

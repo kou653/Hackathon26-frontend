@@ -4,9 +4,7 @@ import React from "react";
 
 export default function SuccessRegistration() {
   const navigate = useNavigate();
-  const goToNextpage = () => {
-    navigate("/hackathon/auth/LogInView");
-  }; 
+
   const goToWhatsApp = () => {
     //https://chat.whatsapp.com/GZX3JYvduuIBRLZr7ywqH6
     navigate("/hackathon/auth/LogInView");
